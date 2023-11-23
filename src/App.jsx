@@ -10,6 +10,8 @@ import {
 
 import HomeView from './views/HomeView'
 
+const baseSpaUrl = import.meta.env.VITE_BASE_SPA_URL
+
 const NoMatch = () => {
   return(
     <>
@@ -37,7 +39,7 @@ const App = () => {
       <div className="top-logo">
         <h1 className="site-title text-medium uppercase">Light Analytics</h1>
       </div>
-      <Router>
+      <Router basename={baseSpaUrl}>
         <Routes />
       </Router>
     </>
