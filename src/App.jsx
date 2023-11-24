@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 
 import HomeView from './views/HomeView'
+import SignupView from './views/SignupView'
 
 const baseSpaUrl = import.meta.env.VITE_BASE_SPA_URL
 
@@ -28,6 +29,7 @@ const NoMatch = () => {
 const Routes = () => {
   const element = useRoutes([
     { path: '/', element: <HomeView />},
+    { path: '/signup', element: <SignupView />},
     { path: '*', element: <NoMatch />}
   ])
   return element;
