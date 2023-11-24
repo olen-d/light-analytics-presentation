@@ -1,6 +1,15 @@
+import { useNavigate } from 'react-router-dom'
+
 import { Button, Stack } from '@mui/material'
 
 const HomeView = () => {
+  const navigate = useNavigate()
+
+  const handleNavigation = e => {
+    const { target: { value: route } } = e
+    navigate(route)
+  }
+
   return (
     <>
       <h1 className="site-lead extended">Open source analytics platform for key customer insights.</h1>
@@ -9,7 +18,7 @@ const HomeView = () => {
       </p>
       <div>
         <Stack justifyContent="center" direction="row" spacing={2}>
-          <Button variant="contained">Get Started</Button>&nbsp;
+          <Button onClick={handleNavigation} value='/signup' variant="contained">Get Started</Button>&nbsp;
           <Button variant="outlined">Log In</Button>
         </Stack>
       </div>
