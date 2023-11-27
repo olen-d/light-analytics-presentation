@@ -11,6 +11,8 @@ import {
 import HomeView from './views/HomeView'
 import SignupView from './views/SignupView'
 
+import TheAppBar from './components/TheAppBar'
+
 const baseSpaUrl = import.meta.env.VITE_BASE_SPA_URL
 
 const NoMatch = () => {
@@ -21,7 +23,7 @@ const NoMatch = () => {
         Call the Vatican. See if something is missing.
       </p>
       <p className='author-quote mt-n1'>
-        -- Dr. Ben Sobel
+        &mdash; Dr. Ben Sobel
       </p>
     </>
   )
@@ -38,10 +40,8 @@ const Routes = () => {
 const App = () => {
   return (
     <>
-      <div className="top-logo">
-        <h1 className="site-title text-medium uppercase">Light Analytics</h1>
-      </div>
       <Router basename={baseSpaUrl}>
+        <TheAppBar />
         <Routes />
       </Router>
     </>
