@@ -22,6 +22,10 @@ a:hover {
   color: #535bf2;
 }
 
+.app-bar a:hover {
+  color: #fff;
+}
+
 body {
   margin: 0;
   display: flex;
@@ -33,10 +37,6 @@ body {
 h1 {
   font-size: 3.2em;
   line-height: 1.1;
-}
-
-h1.site-title {
-  font-weight: 400;
 }
 
 h1.site-lead {
@@ -62,10 +62,6 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 /* Layout */
-.top-logo {
-  position: absolute;
-  top: 1.5rem;
-}
 
 /* Margin Classes */
 .mt-n1 {
