@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 
 import HomeView from './views/HomeView'
+import LoginView from './views/LoginView'
 import SignupView from './views/SignupView'
 
 import TheAppBar from './components/TheAppBar'
@@ -31,10 +32,11 @@ const NoMatch = () => {
 const Routes = () => {
   const element = useRoutes([
     { path: '/', element: <HomeView />},
+    { path: '/login', element: <LoginView />},
     { path: '/signup', element: <SignupView />},
     { path: '*', element: <NoMatch />}
   ])
-  return element;
+  return element
 }
 
 const App = () => {

@@ -19,7 +19,7 @@ const HomeView = () => {
       <div>
         <Stack justifyContent="center" direction="row" spacing={2}>
           <Button onClick={handleNavigation} value='/signup' variant="contained">Get Started</Button>&nbsp;
-          <Button variant="outlined">Log In</Button>
+          <Button onClick={handleNavigation} value='/login' variant="outlined">Log In</Button>
         </Stack>
       </div>
     </>
