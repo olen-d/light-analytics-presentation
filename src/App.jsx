@@ -8,11 +8,16 @@ import {
   useParams
 } from 'react-router-dom'
 
+import AdminView from './views/AdminView'
 import HomeView from './views/HomeView'
 import LoginView from './views/LoginView'
 import SignupView from './views/SignupView'
 
+import ProtectedRoute from './components/ProtectedRoute'
+
 import TheAppBar from './components/TheAppBar'
+
+import { AuthProvider } from './hooks/useAuth'
 
 const baseSpaUrl = import.meta.env.VITE_BASE_SPA_URL
 
@@ -32,6 +37,12 @@ const NoMatch = () => {
 const Routes = () => {
   const element = useRoutes([
     { path: '/', element: <HomeView />},
+    { path: '/admin',
+      element:
+        <ProtectedRoute>
+          <AdminView />
+        </ProtectedRoute>
+    },
     { path: '/login', element: <LoginView />},
     { path: '/signup', element: <SignupView />},
     { path: '*', element: <NoMatch />}
@@ -43,8 +54,10 @@ const App = () => {
   return (
     <>
       <Router basename={baseSpaUrl}>
-        <TheAppBar />
-        <Routes />
+        <AuthProvider>
+          <TheAppBar />
+          <Routes />
+        </AuthProvider>
       </Router>
     </>
   )

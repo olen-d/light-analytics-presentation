@@ -6,6 +6,7 @@ import PropTypes from 'prop-types'
 import InputUsername from './form-fields/InputUsername.jsx'
 import InputPassword from './form-fields/InputPassword.jsx'
 
+import { useAuth } from '../hooks/useAuth.jsx'
 import useForm from '../hooks/useForm'
 
 import Grid from '@mui/material/Unstable_Grid2'
@@ -21,6 +22,8 @@ const FormLogin = ({ submitBtnContent = "Submit" }) => {
     values
   } = useForm()
 
+  const { login } = useAuth()
+  
   const [isError, setIsError] = useState(false)
 
   useEffect(() => {
@@ -31,13 +34,43 @@ const FormLogin = ({ submitBtnContent = "Submit" }) => {
     }
   }, [errors])
 
-  const handleSubmit = () => {
+  const apiKey = import.meta.env.VITE_ANALYTICS_API_KEY
+  const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
+
+  const handleSubmit = async () => {
     if (isError) {
       // Fail
     } else {
-      console.log(`Submit Fired\n${JSON.stringify(values, null, 3)}`)
+      const url = `${baseAnalyticsApiUrl}/api/v1/auth/token/grant-type/password`
+      const requestOptions = {
+        method: 'PUT',
+        credentials: 'include',
+        headers: {
+          'api-key': apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(values)
+      }
+      
+      const response = await fetch(url, requestOptions)
+      const result = await response.json()
+
+      if (result.status === 'ok') {
+        const { data: { tokenType, accessToken, refreshToken } } = result
+        if (tokenType === 'bearer') {
+          login(accessToken, refreshToken)
+        }
+      } else {
+        // Return Error
+      }
+
+
     }
   }
+
+  // const actuallySubmit = () => {
+
+  // }
 
   return(
     <>
@@ -57,6 +90,7 @@ const FormLogin = ({ submitBtnContent = "Submit" }) => {
               handleBlur={handleBlur}
               handleChange={handleChange}
               helperText="Please enter a valid password. Passwords must be at least eight characters long, with one uppercase and one lowecase letter and at least one number or special character"
+              inputName="plaintextPassword"
               required={true}
               values={values}
             />
