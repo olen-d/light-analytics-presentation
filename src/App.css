@@ -4,3 +4,23 @@
   padding: 2rem;
   text-align: center;
 }
+
+.chart-text-label-category {
+  fill: #333;
+}
+
+.chart-text-label-category-name {
+  fill: #333;
+}
+
+.chart-text-label-series-name {
+  fill: #333;
+}
+
+.chart-text-label-ticks {
+  fill: #333;
+}
+
+.chart-series-1 {
+  fill: #337f33;
+}
