@@ -3,13 +3,20 @@
 import { useEffect, useState } from 'react'
 
 import ChartColumn from '../components/ChartColumn'
+import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
+
+import { Unstable_Grid2 as Grid } from '@mui/material'
 
 const AdminView = () => {
   const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
+  const [bounceRate, setBounceRate] = useState(0)
+  const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
+  const [totalVisits, setTotalVisits] = useState(0)
   const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
   const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
+  const [uniqueVisits, setUniqueVisits] = useState(0)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -78,6 +85,98 @@ const AdminView = () => {
     fetchData()
   }, [])
 
+  useEffect(() => {
+    const fetchData = async ()=> {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            'api-key': apiKeyRead
+          }
+        }
+          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/bounce-rate`, requestOptions)
+          const result = await response.json()
+
+          if (result.status === 'ok') {
+            const { data: { bounceRate: br }, } = result
+            setBounceRate(br)
+          }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async ()=> {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            'api-key': apiKeyRead
+          }
+        }
+          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/unique`, requestOptions)
+          const result = await response.json()
+
+          if (result.status === 'ok') {
+            const { data: { uniqueVisits: uv }, } = result
+            setUniqueVisits(uv)
+          }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async ()=> {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            'api-key': apiKeyRead
+          }
+        }
+          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions`, requestOptions)
+          const result = await response.json()
+
+          if (result.status === 'ok') {
+            const { data: { totalVisits: tv }, } = result
+            setTotalVisits(tv)
+          }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async ()=> {
+      try {
+        const requestOptions = {
+          method: 'GET',
+          headers: {
+            'api-key': apiKeyRead
+          }
+        }
+          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/single-page`, requestOptions)
+          const result = await response.json()
+
+          if (result.status === 'ok') {
+            const { data: { totalSinglePageSessions: tsps }, } = result
+            setTotalSinglePageSessions(tsps)
+          }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
   return(
     <>
       <h1 className="site-lead extended">Administration</h1>
@@ -90,6 +189,41 @@ const AdminView = () => {
           startFromValue={0}
         />
       </div>
+      <Grid container spacing={2}>
+        <Grid xs={6} md={4} xl={3}>
+          <div>
+            <DisplayStatisticNumber
+              statisticName='Total Visits'
+              statisticValue={totalVisits}
+            />
+          </div>
+        </Grid>
+        <Grid xs={6} md={4} xl={3}>
+          <div>
+            <DisplayStatisticNumber
+              statisticName='Unique Visits'
+              statisticValue={uniqueVisits}
+            />
+          </div>
+        </Grid>
+        <Grid xs={6} md={4} xl={3}>
+          <div>
+            <DisplayStatisticNumber
+              statisticName='Single Page Sessions'
+              statisticValue={totalSinglePageSessions}
+            />
+          </div>
+        </Grid>
+        <Grid xs={6} md={4} xl={3}>
+          <div>
+            <DisplayStatisticNumber
+              format='percent'
+              statisticName='Bounce Rate'
+              statisticValue={bounceRate}
+            />
+          </div>
+        </Grid>
+      </Grid>
     </>
   )
 }

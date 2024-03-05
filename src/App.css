@@ -24,3 +24,16 @@
 .chart-series-1 {
   fill: #337f33;
 }
+
+.display-statistic-number {
+  background-color: #f8f8f8;
+}
+.display-statistic-number-name {
+  font-size: 1rem;
+  color: #777;
+}
+.display-statistic-number-value {
+  font-weight: 700;
+  font-size: 2rem;
+  color: #888;
+}
