@@ -13,10 +13,22 @@ const AdminView = () => {
 
   const [bounceRate, setBounceRate] = useState(0)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
+  const [totalViewsByDay, setTotalViewsByDay] = useState([])
+  const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
   const [totalVisits, setTotalVisits] = useState(0)
   const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
   const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
   const [uniqueVisits, setUniqueVisits] = useState(0)
+
+  // Utility Functions
+  const formatDateJs = date => {
+    const dayJs = date.getDate()
+    const monthJs = date.getMonth() + 1
+    const day = dayJs.toString().padStart(2, '0')
+    const month = monthJs.toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${year}-${month}-${day}`
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,15 +44,6 @@ const AdminView = () => {
         const startDateJs = new Date()
         startDateJs.setDate(startDateJs.getDate() - 6)
         
-        const formatDateJs = date => {
-          const dayJs = date.getDate()
-          const monthJs = date.getMonth() + 1
-          const day = dayJs.toString().padStart(2, '0')
-          const month = monthJs.toString().padStart(2, '0')
-          const year = date.getFullYear()
-          return `${year}-${month}-${day}`
-        }
-
         const endDate = formatDateJs(endDateJs)
         const startDate = formatDateJs(startDateJs)
 
@@ -76,6 +79,64 @@ const AdminView = () => {
             return { day: dateFormatted, count }
           })
           setTotalVisitsByDayFormatted(formattedDates)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'api-key': apiKeyRead
+        }
+      }
+  
+      try {
+        const endDateJs = new Date()
+        const startDateJs = new Date()
+        startDateJs.setDate(startDateJs.getDate() - 6)
+        
+        const endDate = formatDateJs(endDateJs)
+        const startDate = formatDateJs(startDateJs)
+
+        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/by-day?startdate=${startDate}&enddate=${endDate}`, requestOptions)
+        const result = await response.json()
+        
+        if(result.status === 'ok') {
+          const { data: { totalViewsByDay: tvbd }, } = result
+          setTotalViewsByDay(tvbd)
+
+          const datesInPeriod = []
+
+          for(let i=0; i < 7; i++) {
+            const lastJs = new Date(startDateJs)
+            lastJs.setDate(lastJs.getDate() + i)
+            const last = formatDateJs(lastJs)
+            datesInPeriod.push(last)
+          }
+
+          const totalVisitsWithZeros = datesInPeriod.map(item => {
+            const index = tvbd.findIndex(d => d.day === item)
+            return index === -1 ? { day: item, count: 0} : tvbd[index]
+          })
+
+          const formattedDates = totalVisitsWithZeros.map(item => {
+            const { day, count } = item
+            const dayParts = day.split('-')
+            const jsDate = new Date(dayParts[0], dayParts[1] -1, dayParts[2])
+
+            const options = { weekday: 'short' }
+            const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
+            const dateFormatted = dateTimeFormat.format(jsDate)
+            return { day: dateFormatted, count }
+          })
+          setTotalViewsByDayFormatted(formattedDates)
         }
       } catch (error) {
         console.log(error)
@@ -186,6 +247,15 @@ const AdminView = () => {
           categoryKey='day'
           chartData={totalVisitsByDayFormatted}
           seriesName='Visits'
+          startFromValue={0}
+        />
+      </div>
+      <div>
+        <ChartColumn
+          categoryName='Dates'
+          categoryKey='day'
+          chartData={totalViewsByDayFormatted}
+          seriesName='Page Views'
           startFromValue={0}
         />
       </div>
