@@ -3,9 +3,33 @@
 import { useEffect, useState } from 'react'
 
 import ChartColumn from '../components/ChartColumn'
+import ChartPie from '../components/ChartPie'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
+
+const mockPie = [
+  {
+      "route": "/about",
+      "total_time": "89861",
+      "total_views": 2
+  },
+  {
+      "route": "/courses/jarrett-creek-loop",
+      "total_time": "42256",
+      "total_views": 1
+  },
+  {
+      "route": "/courses/gravel-gambler-intermediate",
+      "total_time": "37293",
+      "total_views": 1
+  },
+  {
+      "route": "/",
+      "total_time": "23107",
+      "total_views": 2
+  }
+]
 
 const AdminView = () => {
   const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
@@ -13,6 +37,9 @@ const AdminView = () => {
 
   const [bounceRate, setBounceRate] = useState(0)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
+  const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
+  const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
+  const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
   const [totalViewsByDay, setTotalViewsByDay] = useState([])
   const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
   const [totalVisits, setTotalVisits] = useState(0)
@@ -28,6 +55,16 @@ const AdminView = () => {
     const month = monthJs.toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${year}-${month}-${day}`
+  }
+
+  const formatSlug = slug => {
+    return slug
+      .toLowerCase()
+      .split('-')
+      .map(item => {
+        return item[0].toUpperCase() + item.substr(1)
+      })
+      .join(' ')
   }
 
   useEffect(() => {
@@ -137,6 +174,52 @@ const AdminView = () => {
             return { day: dateFormatted, count }
           })
           setTotalViewsByDayFormatted(formattedDates)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+
+    fetchData()
+  }, [])
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'api-key': apiKeyRead
+        }
+      }
+  
+      try {
+        const endDateJs = new Date()
+        const startDateJs = new Date()
+        startDateJs.setDate(startDateJs.getDate() - 6)
+        
+        const endDate = formatDateJs(endDateJs)
+        const startDate = formatDateJs(startDateJs)
+
+        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/routes/total-time-views?startdate=${startDate}&enddate=${endDate}`, requestOptions)
+        const result = await response.json()
+        
+        if(result.status === 'ok') {
+          const { data: ttvbr } = result
+          setTotalTimeViewsByRoute(ttvbr)
+
+          const filteredTotalTimeViewsByRoute = ttvbr.filter(item => {
+            const { route } = item
+            return route.includes('/courses/')
+          })
+
+          const totalViewsByRoute = filteredTotalTimeViewsByRoute.map(item => {
+            const { route, 'total_views': value } = item
+            const routeSlug = route.split('/').pop()
+            const dataLabel = formatSlug(routeSlug)
+            return({ dataLabel, value })
+          })
+
+          setTotalViewsByRouteFormatted(totalViewsByRoute)
         }
       } catch (error) {
         console.log(error)
@@ -257,6 +340,12 @@ const AdminView = () => {
           chartData={totalViewsByDayFormatted}
           seriesName='Page Views'
           startFromValue={0}
+        />
+      </div>
+      <div>
+        <ChartPie
+          chartColors={['#0544ff', '#2a4ff4', '#3d58e8', '#4c61dc', '#5969cf']}
+          chartData={totalViewsByRouteFormatted}
         />
       </div>
       <Grid container spacing={2}>
