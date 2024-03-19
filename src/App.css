@@ -21,6 +21,11 @@
   fill: #333;
 }
 
+.chart-text-legend {
+  font-size: 0.8rem;
+  fill: #333;
+}
+
 .chart-series-1 {
   fill: #337f33;
 }
