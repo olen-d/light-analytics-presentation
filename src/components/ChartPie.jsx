@@ -9,7 +9,6 @@ const ChartPie = (
   {
     chartColors,
     chartData,
-    endAngle = 0,
     startAngle = 0
   }
 ) => {
@@ -19,7 +18,7 @@ const ChartPie = (
   const radius = Math.min(PIE_WIDTH, PIE_HEIGHT) / 2
 
   let chartStartAngle = startAngle
-  let chartEndAngle = endAngle
+  let chartEndAngle = chartStartAngle
   let nextX = 0
   let x = 0
   let y = 0
@@ -35,7 +34,7 @@ const ChartPie = (
     x = nextX
     if (x > SVG_WIDTH - textOffset) {
       x = 0
-      nextX = textOffset + 8
+      nextX = textOffset
       y += 22
     } else {
       nextX += textOffset
