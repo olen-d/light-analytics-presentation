@@ -212,7 +212,11 @@ const AdminView = () => {
             return route.includes('/courses/')
           })
 
-          const totalViewsByRoute = filteredTotalTimeViewsByRoute.map(item => {
+          const sortedTotalViewsByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
+            return b.total_views - a.total_views
+          })
+
+          const totalViewsByRoute = sortedTotalViewsByRoute.map(item => {
             const { route, 'total_views': value } = item
             const routeSlug = route.split('/').pop()
             const dataLabel = formatSlug(routeSlug)
@@ -344,8 +348,9 @@ const AdminView = () => {
       </div>
       <div>
         <ChartPie
-          chartColors={['#0544ff', '#2a4ff4', '#3d58e8', '#4c61dc', '#5969cf']}
+          chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalViewsByRouteFormatted}
+          startAngle={-90}
         />
       </div>
       <Grid container spacing={2}>
