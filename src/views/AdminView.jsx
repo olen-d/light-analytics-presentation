@@ -204,6 +204,16 @@ const AdminView = () => {
         const result = await response.json()
         
         if(result.status === 'ok') {
+          const exceededFormatted = values => {
+            const categories = values.slice(0,4)
+            const others = values.slice(4)
+
+            const otherTotal = others.reduce((sum, { value }) => sum + value, 0)
+            categories.push({ dataLabel: 'Other', value: otherTotal})
+
+            return categories
+          }
+  
           const { data: ttvbr } = result
           setTotalTimeViewsByRoute(ttvbr)
 
@@ -223,7 +233,9 @@ const AdminView = () => {
             return({ dataLabel, value })
           })
 
-          setTotalViewsByRouteFormatted(totalViewsByRoute)
+          const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
+    
+          setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
         }
       } catch (error) {
         console.log(error)
