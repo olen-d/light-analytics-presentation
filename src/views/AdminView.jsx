@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import ChartColumn from '../components/ChartColumn'
 import ChartPie from '../components/ChartPie'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
+import LayoutChart from '../components/LayoutChart'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -359,7 +360,8 @@ const AdminView = () => {
         />
       </div>
       <div>
-        <ChartPie
+        <LayoutChart
+          chart={ChartPie}
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalViewsByRouteFormatted}
           startAngle={-90}
