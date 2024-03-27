@@ -5,6 +5,17 @@
   text-align: center;
 }
 
+.chart-legend-patch {
+  width: 0.8rem;
+  height: 0.8rem;
+  /* vertical-align: bottom; */
+  background: #000;
+}
+
+.chart-text-data-label {
+  font-size: 0.8rem;
+  fill: #333;
+}
 .chart-text-label-category {
   fill: #333;
 }
@@ -24,6 +35,7 @@
 .chart-text-legend {
   font-size: 0.8rem;
   fill: #333;
+  margin-top: -0.2rem;
 }
 
 .chart-series-1 {
@@ -41,4 +53,19 @@
   font-weight: 700;
   font-size: 2rem;
   color: #888;
+}
+
+.container-legend-chart {
+  display: flex;
+  flex-wrap: wrap;
+  width: 500px;
+  text-align: left;
+}
+
+.container-legend-items {
+  display: grid;
+  gap: 0.4rem;
+  grid-template-columns: 0.8rem auto;
+  margin-right: 0.8rem;
+  margin-bottom: 0.4rem;
 }

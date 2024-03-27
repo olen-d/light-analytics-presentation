@@ -28,8 +28,9 @@ const InputUsername = (
       <TextField
         error={errors[inputName] }
         helperText={errors[inputName] ? helperText : null }
-        name={inputName}
         label={labeltext}
+        inputProps={{ autoCapitalize: "off", autoCorrect: "off" }}
+        name={inputName}
         placeholder={placeholder}
         required={required}
         value={values[inputName] || ""}
