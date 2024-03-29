@@ -38,6 +38,7 @@ const AdminView = () => {
 
   const [bounceRate, setBounceRate] = useState(0)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
+  const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
   const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
@@ -227,6 +228,10 @@ const AdminView = () => {
             return b.total_views - a.total_views
           })
 
+          const sortedTotalTimeByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
+            return b.total_time - a.total_time
+          })
+
           const totalViewsByRoute = sortedTotalViewsByRoute.map(item => {
             const { route, 'total_views': value } = item
             const routeSlug = route.split('/').pop()
@@ -234,9 +239,18 @@ const AdminView = () => {
             return({ dataLabel, value })
           })
 
+          const totalTimeByRoute = sortedTotalTimeByRoute.map(item => {
+            const { route, 'total_time': value } = item
+            const routeSlug = route.split('/').pop()
+            const dataLabel = formatSlug(routeSlug)
+            return({ dataLabel, value })
+          })
+      
           const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
-    
+          const totalTimeByRouteFinal = totalTimeByRoute.length > 5 ? exceededFormatted(totalTimeByRoute) : totalTimeByRoute
+console.log(JSON.stringify(totalViewsByRouteFinal, null, 3))
           setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
+          setTotalTimeByRouteFormatted(totalTimeByRouteFinal)
         }
       } catch (error) {
         console.log(error)
@@ -364,6 +378,14 @@ const AdminView = () => {
           chart={ChartPie}
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalViewsByRouteFormatted}
+          startAngle={-90}
+        />
+      </div>
+      <div>
+        <LayoutChart
+          chart={ChartPie}
+          chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
+          chartData={totalTimeByRouteFormatted}
           startAngle={-90}
         />
       </div>
