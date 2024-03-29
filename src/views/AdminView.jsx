@@ -248,7 +248,7 @@ const AdminView = () => {
       
           const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
           const totalTimeByRouteFinal = totalTimeByRoute.length > 5 ? exceededFormatted(totalTimeByRoute) : totalTimeByRoute
-console.log(JSON.stringify(totalViewsByRouteFinal, null, 3))
+
           setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
           setTotalTimeByRouteFormatted(totalTimeByRouteFinal)
         }
