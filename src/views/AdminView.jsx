@@ -379,6 +379,7 @@ const AdminView = () => {
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalViewsByRouteFormatted}
           startAngle={-90}
+          title="Courses by Page Views"
         />
       </div>
       <div>
@@ -387,6 +388,7 @@ const AdminView = () => {
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalTimeByRouteFormatted}
           startAngle={-90}
+          title="Courses by Viewing Time"
         />
       </div>
       <Grid container spacing={2}>
