@@ -3,6 +3,7 @@
 import { PropTypes } from 'prop-types'
 
 import LegendChart from './LegendChart'
+import SubtitleChart from './SubtitleChart'
 import TitleChart from './TitleChart'
 
 const LayoutChart = ({
@@ -11,13 +12,14 @@ const LayoutChart = ({
   chartData,
   locationLegend,
   startAngle = 0,
-  subTitle,
+  subtitle,
   title,
   source
 }) => {
  return (
   <>
     <TitleChart title={title} />
+    <SubtitleChart subtitle={subtitle} />
     <LegendChart chartColors={chartColors} chartData={chartData} />
     <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
   </>
@@ -31,7 +33,7 @@ LayoutChart.propTypes = {
   chartData: array,
   locationLegend: string,
   startAngle: number,
-  subTitle: string,
+  subtitle: string,
   title: string,
   source: string
 }
