@@ -37,6 +37,8 @@ const AdminView = () => {
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
   const [bounceRate, setBounceRate] = useState(0)
+  const [startDateViews, setStartDateViews] = useState(null)
+  const [endDateViews, setEndDateViews] = useState(null)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
@@ -57,6 +59,11 @@ const AdminView = () => {
     const month = monthJs.toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${year}-${month}-${day}`
+  }
+
+  const formatDateHuman = (date, options) => {
+    const dateTimeFormatHuman = new Intl.DateTimeFormat('en-US', options).format(date)
+    return dateTimeFormatHuman
   }
 
   const formatSlug = slug => {
@@ -206,6 +213,14 @@ const AdminView = () => {
         const result = await response.json()
         
         if(result.status === 'ok') {
+          const dateOptions = {
+            month: 'long',
+            day: 'numeric'
+          }
+
+          setStartDateViews(formatDateHuman(startDateJs, dateOptions))
+          setEndDateViews(formatDateHuman(endDateJs, dateOptions))
+
           const exceededFormatted = values => {
             const categories = values.slice(0,4)
             const others = values.slice(4)
@@ -379,6 +394,7 @@ const AdminView = () => {
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalViewsByRouteFormatted}
           startAngle={-90}
+          subtitle={`${startDateViews} to ${endDateViews}`}
           title="Courses by Page Views"
         />
       </div>
@@ -388,6 +404,7 @@ const AdminView = () => {
           chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
           chartData={totalTimeByRouteFormatted}
           startAngle={-90}
+          subtitle={`${startDateViews} to ${endDateViews}`}
           title="Courses by Viewing Time"
         />
       </div>
