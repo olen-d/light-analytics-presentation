@@ -3,6 +3,7 @@
 import { PropTypes } from 'prop-types'
 
 import LegendChart from './LegendChart'
+import SourceChart from './SourceChart'
 import SubtitleChart from './SubtitleChart'
 import TitleChart from './TitleChart'
 
@@ -22,6 +23,7 @@ const LayoutChart = ({
     <SubtitleChart subtitle={subtitle} />
     <LegendChart chartColors={chartColors} chartData={chartData} />
     <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
+    {source && <SourceChart source={source} />}
   </>
  )
 }

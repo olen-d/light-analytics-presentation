@@ -395,6 +395,7 @@ const AdminView = () => {
           chartData={totalViewsByRouteFormatted}
           startAngle={-90}
           subtitle={`${startDateViews} to ${endDateViews}`}
+          source="No Car Gravel"
           title="Courses by Page Views"
         />
       </div>
@@ -405,6 +406,7 @@ const AdminView = () => {
           chartData={totalTimeByRouteFormatted}
           startAngle={-90}
           subtitle={`${startDateViews} to ${endDateViews}`}
+          source="No Car Gravel"
           title="Courses by Viewing Time"
         />
       </div>
