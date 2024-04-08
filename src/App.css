@@ -82,8 +82,8 @@
 
 .container-legend-chart {
   display: flex;
+  flex-direction: column;
   flex-wrap: wrap;
-  width: 500px;
   text-align: left;
 }
 
