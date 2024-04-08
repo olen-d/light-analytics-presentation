@@ -21,8 +21,8 @@ const LayoutChart = ({
   <>
     <TitleChart title={title} />
     <SubtitleChart subtitle={subtitle} />
-    <LegendChart chartColors={chartColors} chartData={chartData} />
     <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
+    <LegendChart chartColors={chartColors} chartData={chartData} />
     {source && <SourceChart source={source} />}
   </>
  )
