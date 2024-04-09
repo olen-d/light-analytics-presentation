@@ -22,11 +22,15 @@ const LegendChart = ({
     )
   }
 
-  return (
-    <div className="container-legend-chart">
-      {chartData.map(renderItem)}
-    </div>
-  )
+  if (chartData?.length > 0) {
+    return (
+      <div className="container-legend-chart">
+        {chartData.map(renderItem)}
+      </div>
+    )
+  } else {
+    return null
+  }
 }
 
 const { array } = PropTypes
