@@ -39,6 +39,8 @@ const AdminView = () => {
   const [bounceRate, setBounceRate] = useState(0)
   const [startDateViews, setStartDateViews] = useState(null)
   const [endDateViews, setEndDateViews] = useState(null)
+  const [startDateVisits, setStartDateVisits] = useState(null)
+  const [endDateVisits, setEndDateVisits] = useState(null)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
@@ -97,6 +99,14 @@ const AdminView = () => {
         const result = await response.json()
         
         if(result.status === 'ok') {
+          const dateOptions = {
+            month: 'long',
+            day: 'numeric'
+          }
+
+          setStartDateVisits(formatDateHuman(startDateJs, dateOptions))
+          setEndDateVisits(formatDateHuman(endDateJs, dateOptions))
+
           const { data: { totalVisitsByDay: tvbd }, } = result
           setTotalVisitsByDay(tvbd)
 
@@ -367,25 +377,43 @@ const AdminView = () => {
     fetchData()
   }, [])
 
+  const ChartColumnVisits = () => (
+    <ChartColumn
+      categoryName='Dates'
+      categoryKey='day'
+      chartData={totalVisitsByDayFormatted}
+      seriesName='Visits'
+      startFromValue={0}
+    />
+  )
+
+  const ChartColumnViews = () => (
+    <ChartColumn
+      categoryName='Dates'
+      categoryKey='day'
+      chartData={totalViewsByDayFormatted}
+      seriesName='Page Views'
+      startFromValue={0}
+    />
+  )
+
   return(
     <>
       <h1 className="site-lead extended">Administration</h1>
       <div>
-        <ChartColumn
-          categoryName='Dates'
-          categoryKey='day'
-          chartData={totalVisitsByDayFormatted}
-          seriesName='Visits'
-          startFromValue={0}
+        <LayoutChart
+          chart={ChartColumnVisits}
+          subtitle={`${startDateVisits} to ${endDateVisits}`}
+          source="No Car Gravel"
+          title="Visits by Weekday"
         />
       </div>
       <div>
-        <ChartColumn
-          categoryName='Dates'
-          categoryKey='day'
-          chartData={totalViewsByDayFormatted}
-          seriesName='Page Views'
-          startFromValue={0}
+      <LayoutChart
+          chart={ChartColumnViews}
+          subtitle={`${startDateVisits} to ${endDateVisits}`}
+          source="No Car Gravel"
+          title="Page Views by Weekday"
         />
       </div>
       <div>
