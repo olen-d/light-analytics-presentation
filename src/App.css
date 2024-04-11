@@ -1,8 +1,19 @@
 #root {
+  width:100%;
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
+}
+
+.layout-chart-container {
+  margin-bottom: 3rem;
+}
+
+.chart-graphic {
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
 .chart-legend-patch {
@@ -17,6 +28,7 @@
   fill: #333;
 }
 .chart-text-label-category {
+  font-size: 0.8rem;
   fill: #333;
 }
 
@@ -46,14 +58,17 @@
 }
 
 .chart-text-label-category-name {
+  font-size: 0.8rem;
   fill: #333;
 }
 
 .chart-text-label-series-name {
+  font-size: 0.8rem;
   fill: #333;
 }
 
 .chart-text-label-ticks {
+  font-size: 0.8rem;
   fill: #333;
 }
 
@@ -81,6 +96,7 @@
 }
 
 .container-legend-chart {
+  margin-bottom: 1rem;
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
