@@ -1,7 +1,7 @@
 'use strict'
 
-const SVG_WIDTH = 500
-const SVG_HEIGHT = 400
+const SVG_WIDTH = 300
+const SVG_HEIGHT = 200
 const PIE_WIDTH = SVG_WIDTH
 const PIE_HEIGHT = SVG_HEIGHT
 
@@ -16,7 +16,7 @@ const ChartPie = (
 
   const centerX = SVG_WIDTH / 2
   const centerY = SVG_HEIGHT / 2
-  const radius = Math.min(PIE_WIDTH, PIE_HEIGHT) / 2 - 25
+  const radius = Math.min(PIE_WIDTH, PIE_HEIGHT) / 2
 
   let chartStartAngle = startAngle
   let chartEndAngle = chartStartAngle
@@ -46,9 +46,11 @@ const ChartPie = (
   }
 
   return (
-    <svg width={SVG_WIDTH} height={SVG_HEIGHT}>
-      {chartData.map(renderSlice)}
-    </svg>
+    <div className="chart-graphic">
+      <svg width={SVG_WIDTH} height={SVG_HEIGHT}>
+        {chartData.map(renderSlice)}
+      </svg>
+    </div>
   )
 }
 

@@ -18,13 +18,13 @@ const LayoutChart = ({
   source
 }) => {
  return (
-  <>
+  <div className="layout-chart-container">
     <TitleChart title={title} />
     <SubtitleChart subtitle={subtitle} />
     <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
     <LegendChart chartColors={chartColors} chartData={chartData} />
     {source && <SourceChart source={source} />}
-  </>
+  </div>
  )
 }
 

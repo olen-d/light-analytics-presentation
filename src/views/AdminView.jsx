@@ -379,7 +379,7 @@ const AdminView = () => {
 
   const ChartColumnVisits = () => (
     <ChartColumn
-      categoryName='Dates'
+      categoryName='Days'
       categoryKey='day'
       chartData={totalVisitsByDayFormatted}
       seriesName='Visits'
@@ -389,7 +389,7 @@ const AdminView = () => {
 
   const ChartColumnViews = () => (
     <ChartColumn
-      categoryName='Dates'
+      categoryName='Days'
       categoryKey='day'
       chartData={totalViewsByDayFormatted}
       seriesName='Page Views'
@@ -399,47 +399,51 @@ const AdminView = () => {
 
   return(
     <>
-      <h1 className="site-lead extended">Administration</h1>
-      <div>
-        <LayoutChart
-          chart={ChartColumnVisits}
-          subtitle={`${startDateVisits} to ${endDateVisits}`}
-          source="No Car Gravel"
-          title="Visits by Weekday"
-        />
-      </div>
-      <div>
-      <LayoutChart
-          chart={ChartColumnViews}
-          subtitle={`${startDateVisits} to ${endDateVisits}`}
-          source="No Car Gravel"
-          title="Page Views by Weekday"
-        />
-      </div>
-      <div>
-        <LayoutChart
-          chart={ChartPie}
-          chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-          chartData={totalViewsByRouteFormatted}
-          startAngle={-90}
-          subtitle={`${startDateViews} to ${endDateViews}`}
-          source="No Car Gravel"
-          title="Courses by Page Views"
-        />
-      </div>
-      <div>
-        <LayoutChart
-          chart={ChartPie}
-          chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-          chartData={totalTimeByRouteFormatted}
-          startAngle={-90}
-          subtitle={`${startDateViews} to ${endDateViews}`}
-          source="No Car Gravel"
-          title="Courses by Viewing Time"
-        />
-      </div>
+      <h1 className="admin-lead extended">Administration</h1>
+      <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartColumnVisits}
+            subtitle={`${startDateVisits} to ${endDateVisits}`}
+            source="No Car Gravel"
+            title="Visits by Weekday"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartColumnViews}
+            subtitle={`${startDateVisits} to ${endDateVisits}`}
+            source="No Car Gravel"
+            title="Page Views by Weekday"
+          />
+        </Grid>
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+              chart={ChartPie}
+              chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
+              chartData={totalViewsByRouteFormatted}
+              startAngle={-90}
+              subtitle={`${startDateViews} to ${endDateViews}`}
+              source="No Car Gravel"
+              title="Courses by Page Views"
+          />  
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartPie}
+            chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
+            chartData={totalTimeByRouteFormatted}
+            startAngle={-90}
+            subtitle={`${startDateViews} to ${endDateViews}`}
+            source="No Car Gravel"
+            title="Courses by Viewing Time"
+          />
+        </Grid>
+      </Grid>
       <Grid container spacing={2}>
-        <Grid xs={6} md={4} xl={3}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
           <div>
             <DisplayStatisticNumber
               statisticName='Total Visits'
@@ -447,7 +451,7 @@ const AdminView = () => {
             />
           </div>
         </Grid>
-        <Grid xs={6} md={4} xl={3}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
           <div>
             <DisplayStatisticNumber
               statisticName='Unique Visits'
@@ -455,7 +459,7 @@ const AdminView = () => {
             />
           </div>
         </Grid>
-        <Grid xs={6} md={4} xl={3}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
           <div>
             <DisplayStatisticNumber
               statisticName='Single Page Sessions'
@@ -463,7 +467,7 @@ const AdminView = () => {
             />
           </div>
         </Grid>
-        <Grid xs={6} md={4} xl={3}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
           <div>
             <DisplayStatisticNumber
               format='percent'

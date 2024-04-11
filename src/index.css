@@ -43,6 +43,11 @@ h1 {
   line-height: 1.1;
 }
 
+h1.admin-lead {
+  margin-top: 6rem;
+  font-weight: 400;
+}
+
 h1.site-lead {
   font-weight: 400;
 }
@@ -103,6 +108,19 @@ button:focus-visible {
 
 .uppercase {
   text-transform: uppercase;
+}
+
+@media screen and (max-width: 600px)
+{
+  h1.admin-lead {
+    margin-top: 4rem;
+    margin-bottom: 2rem;
+    font-size: 2rem;
+  }
+
+  .extended {
+    letter-spacing: 0.2rem;
+  }
 }
 
 @media (prefers-color-scheme: light) {
