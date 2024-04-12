@@ -49,41 +49,62 @@ export const AuthProvider = ({ children }) => {
 
   const updateVerification = async () => {
     try {
-      // Check for a bearerToken
-      // Check for a refreshToken
-
-
-      const result = await verifyBearerToken(bearerToken, bearerTokenPublicKey.current)
-      const { payload : { exp, role, sub }, } = result
-
-      const currentTimestamp = Date.now() / 1000
-      const secondsToExpiration =  exp - currentTimestamp
-      if (secondsToExpiration < 3600) {
-        const url = `${baseAnalyticsApiUrl}/api/v1/auth/token/grant-type/refresh-token`
-        const requestOptions = {
-          method: 'POST',
-          headers: {
-            'api-key': apiKey,
-          },
-          body: JSON.stringify({ refreshToken: 'none' })
-        }
-        
-        const response = await fetch(url, requestOptions)
-        const result = await response.json()
-        if (result.status === 'ok') {
-        // Destructure the data
-          const { data: { tokenType, accessToken, refreshToken } } = result
-          if (tokenType === 'bearer') {
-            // login(accessToken, refreshToken)
+      if (bearerToken) {
+        const result = await verifyBearerToken(bearerToken, bearerTokenPublicKey.current)
+        const { payload : { exp, role, sub }, } = result
+  
+        const currentTimestamp = Date.now() / 1000
+        const secondsToExpiration =  exp - currentTimestamp
+        if (secondsToExpiration < 3600) {
+          const url = `${baseAnalyticsApiUrl}/api/v1/auth/token/grant-type/refresh-token`
+          const requestOptions = {
+            method: 'POST',
+            headers: {
+              'api-key': apiKey,
+            },
+            body: JSON.stringify({ refreshToken: 'none' })
           }
-        } else {
-          // Deal with the error
+          
+          const response = await fetch(url, requestOptions)
+          const result = await response.json()
+          if (result.status === 'ok') {
+          // Destructure the data
+            const { data: { tokenType, accessToken, refreshToken } } = result
+            if (tokenType === 'bearer') {
+              // login(accessToken, refreshToken)
+            }
+          } else {
+            // Deal with the error
+          }
+        }
+        setBtExp(exp)
+        setBtRole(role)
+        setBtSub(sub)
+        setIsAuthenticated(true)
+      } else {
+        const refreshToken = localStorage.getItem('refreshTokenSPA') ? localStorage.getItem('refreshTokenSPA') : false
+
+        if (refreshToken) {
+          const url = `${baseAnalyticsApiUrl}/api/v1/auth/token/grant-type/refresh-token`
+          const requestOptions = {
+            method: 'POST',
+            headers: {
+              'api-key': apiKey,
+            },
+            body: JSON.stringify({ refreshToken, test:'doritos' })
+          }
+          
+          const response = await fetch(url, requestOptions)
+          const result = await response.json()
+          if (result.status === 'ok') {
+          // Destructure the data
+            const { data: { tokenType, accessToken, refreshToken } } = result
+            if (tokenType === 'bearer') {
+              login(accessToken, refreshToken)
+            }
+          }
         }
       }
-      setBtExp(exp)
-      setBtRole(role)
-      setBtSub(sub)
-      setIsAuthenticated(true)
     } catch (error) {
       console.log(error)
       return false
