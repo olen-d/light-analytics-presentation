@@ -21,10 +21,12 @@ const AdminView = () => {
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
+  const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
   const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
   const [totalViewsByDay, setTotalViewsByDay] = useState([])
   const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
+  const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
   const [totalVisits, setTotalVisits] = useState(0)
   const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
   const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
@@ -221,6 +223,36 @@ const AdminView = () => {
           const { data: ttvbr } = result
           setTotalTimeViewsByRoute(ttvbr)
 
+          const sortedTotalViewsByRoute = ttvbr.toSorted((a, b) => {
+            return b.total_views - a.total_views
+          })
+
+          const sortedTotalTimeByRoute = ttvbr.toSorted((a, b) => {
+            return b.total_time - a.total_time
+          })
+
+          const totalViewsByRoute = sortedTotalViewsByRoute.map(item => {
+            const { route, 'total_views': value } = item
+            // const routeSlug = route === '/' ? 'Root' : route.split('/')
+            // const dataLabel = formatSlug(routeSlug)
+            const dataLabel = route
+            return({ dataLabel, value })
+          })
+
+          const totalTimeByRoute = sortedTotalTimeByRoute.map(item => {
+            const { route, 'total_time': value } = item
+            // const routeSlug = route === '/' ? 'Root' : route.split('/')
+            // const dataLabel = formatSlug(routeSlug)
+            const dataLabel = route
+            return({ dataLabel, value })
+          })
+      
+          const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
+          const totalTimeByRouteFinal = totalTimeByRoute.length > 5 ? exceededFormatted(totalTimeByRoute) : totalTimeByRoute
+
+          setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
+          setTotalTimeByRouteFormatted(totalTimeByRouteFinal)
+
           const filteredTotalTimeViewsByRoute = ttvbr.filter(item => {
             const { route } = item
             return route.includes('/courses/')
@@ -396,6 +428,17 @@ const AdminView = () => {
         </Grid>
       </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+              chart={ChartPie}
+              chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
+              chartData={totalViewsByRouteFormatted}
+              startAngle={-90}
+              subtitle={`${startDateViews} to ${endDateViews}`}
+              source="No Car Gravel"
+              title="Routes by Page Views"
+          />  
+        </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
           <LayoutChart
               chart={ChartPie}
