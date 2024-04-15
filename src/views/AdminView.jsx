@@ -9,29 +9,6 @@ import LayoutChart from '../components/LayoutChart'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
-const mockPie = [
-  {
-      "route": "/about",
-      "total_time": "89861",
-      "total_views": 2
-  },
-  {
-      "route": "/courses/jarrett-creek-loop",
-      "total_time": "42256",
-      "total_views": 1
-  },
-  {
-      "route": "/courses/gravel-gambler-intermediate",
-      "total_time": "37293",
-      "total_views": 1
-  },
-  {
-      "route": "/",
-      "total_time": "23107",
-      "total_views": 2
-  }
-]
-
 const AdminView = () => {
   const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
@@ -42,8 +19,8 @@ const AdminView = () => {
   const [startDateVisits, setStartDateVisits] = useState(null)
   const [endDateVisits, setEndDateVisits] = useState(null)
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
-  const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
-  const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
+  const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
+  const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
   const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
   const [totalViewsByDay, setTotalViewsByDay] = useState([])
@@ -249,33 +226,33 @@ const AdminView = () => {
             return route.includes('/courses/')
           })
 
-          const sortedTotalViewsByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
+          const sortedFilteredTotalViewsByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
             return b.total_views - a.total_views
           })
 
-          const sortedTotalTimeByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
+          const sortedFilteredTotalTimeByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
             return b.total_time - a.total_time
           })
 
-          const totalViewsByRoute = sortedTotalViewsByRoute.map(item => {
+          const totalFilteredViewsByRoute = sortedFilteredTotalViewsByRoute.map(item => {
             const { route, 'total_views': value } = item
             const routeSlug = route.split('/').pop()
             const dataLabel = formatSlug(routeSlug)
             return({ dataLabel, value })
           })
 
-          const totalTimeByRoute = sortedTotalTimeByRoute.map(item => {
+          const totalFilteredTimeByRoute = sortedFilteredTotalTimeByRoute.map(item => {
             const { route, 'total_time': value } = item
             const routeSlug = route.split('/').pop()
             const dataLabel = formatSlug(routeSlug)
             return({ dataLabel, value })
           })
       
-          const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
-          const totalTimeByRouteFinal = totalTimeByRoute.length > 5 ? exceededFormatted(totalTimeByRoute) : totalTimeByRoute
+          const totalFilteredViewsByRouteFinal = totalFilteredViewsByRoute.length > 5 ? exceededFormatted(totalFilteredViewsByRoute) : totalFilteredViewsByRoute
+          const totalFilteredTimeByRouteFinal = totalFilteredTimeByRoute.length > 5 ? exceededFormatted(totalFilteredTimeByRoute) : totalFilteredTimeByRoute
 
-          setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
-          setTotalTimeByRouteFormatted(totalTimeByRouteFinal)
+          setTotalFilteredViewsByRouteFormatted(totalFilteredViewsByRouteFinal)
+          setTotalFilteredTimeByRouteFormatted(totalFilteredTimeByRouteFinal)
         }
       } catch (error) {
         console.log(error)
@@ -423,7 +400,7 @@ const AdminView = () => {
           <LayoutChart
               chart={ChartPie}
               chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-              chartData={totalViewsByRouteFormatted}
+              chartData={totalFilteredViewsByRouteFormatted}
               startAngle={-90}
               subtitle={`${startDateViews} to ${endDateViews}`}
               source="No Car Gravel"
@@ -434,7 +411,7 @@ const AdminView = () => {
           <LayoutChart
             chart={ChartPie}
             chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-            chartData={totalTimeByRouteFormatted}
+            chartData={totalFilteredTimeByRouteFormatted}
             startAngle={-90}
             subtitle={`${startDateViews} to ${endDateViews}`}
             source="No Car Gravel"
