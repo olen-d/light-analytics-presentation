@@ -21,6 +21,7 @@ const AdminView = () => {
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
+  const [totalTimeByDayFormatted, setTotalTimeByDayFormatted] = useState([])
   const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
   const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
@@ -171,7 +172,23 @@ const AdminView = () => {
             const dateFormatted = dateTimeFormat.format(jsDate)
             return { day: dateFormatted, count }
           })
+
           setTotalViewsByDayFormatted(formattedDates)
+
+          const totalTimeByDayFinal = totalVisitsWithZeros.map(item => {
+            const { day, total_time } = item
+            const dayParts = day.split('-')
+            const jsDate = new Date(dayParts[0], dayParts[1] -1, dayParts[2])
+
+            const options = { weekday: 'short' }
+            const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
+            const dateFormatted = dateTimeFormat.format(jsDate)
+
+            const minutes = total_time === undefined ? Number(0) : total_time / 1000 / 60
+            return { day: dateFormatted, count: minutes }
+          })
+
+          setTotalTimeByDayFormatted(totalTimeByDayFinal)
         }
       } catch (error) {
         console.log(error)
@@ -406,6 +423,16 @@ const AdminView = () => {
     />
   )
 
+  const ChartColumnTime = () => (
+    <ChartColumn
+      categoryName='Days'
+      categoryKey='day'
+      chartData={totalTimeByDayFormatted}
+      seriesName='Minutes'
+      startFromValue={0}
+    />
+  )
+
   return(
     <>
       <h1 className="admin-lead extended">Administration</h1>
@@ -424,6 +451,14 @@ const AdminView = () => {
             subtitle={`${startDateVisits} to ${endDateVisits}`}
             source="No Car Gravel"
             title="Page Views by Weekday"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartColumnTime}
+            subtitle={`${startDateVisits} to ${endDateVisits}`}
+            source="No Car Gravel"
+            title="Viewing Time by Weekday"
           />
         </Grid>
       </Grid>
