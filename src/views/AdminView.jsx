@@ -21,10 +21,12 @@ const AdminView = () => {
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
+  const [totalTimeByConsolidatedRouteFormatted, setTotalTimeByConsolidatedRouteFormatted] = useState([])
   const [totalTimeByDayFormatted, setTotalTimeByDayFormatted] = useState([])
   const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
   const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
+  const [totalViewsByConsolidatedRouteFormatted, setTotalViewsByConsolidatedRouteFormatted] = useState([])
   const [totalViewsByDay, setTotalViewsByDay] = useState([])
   const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
   const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
@@ -34,6 +36,16 @@ const AdminView = () => {
   const [uniqueVisits, setUniqueVisits] = useState(0)
 
   // Utility Functions
+  const exceededFormatted = values => {
+    const categories = values.slice(0,4)
+    const others = values.slice(4)
+
+    const otherTotal = others.reduce((sum, { value }) => sum + value, 0)
+    categories.push({ dataLabel: 'Other', value: otherTotal})
+
+    return categories
+  }
+
   const formatDateJs = date => {
     const dayJs = date.getDate()
     const monthJs = date.getMonth() + 1
@@ -57,6 +69,69 @@ const AdminView = () => {
       })
       .join(' ')
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'api-key': apiKeyRead
+        }
+      }
+  
+      try {
+        const endDateJs = new Date()
+        const startDateJs = new Date()
+        startDateJs.setDate(startDateJs.getDate() - 6)
+        
+        const endDate = formatDateJs(endDateJs)
+        const startDate = formatDateJs(startDateJs)
+
+        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/routes/total-time-views?startdate=${startDate}&enddate=${endDate}&levels=${2}`, requestOptions)
+        const result = await response.json()
+        
+        if(result.status === 'ok') {
+          const dateOptions = {
+            month: 'long',
+            day: 'numeric'
+          }
+          setStartDateViews(formatDateHuman(startDateJs, dateOptions))
+          setEndDateViews(formatDateHuman(endDateJs, dateOptions))
+
+          const { data: ttvbcr } = result
+
+          const sortedTotalViewsByConsolidatedRoute = ttvbcr.toSorted((a, b) => {
+            return b.total_views - a.total_views
+          })
+
+          const sortedTotalTimeByConsolidatedRoute = ttvbcr.toSorted((a, b) => {
+            return b.total_time - a.total_time
+          })
+
+          const totalViewsByConsolidatedRoute = sortedTotalViewsByConsolidatedRoute.map(item => {
+            const { 'route_consolidated': routeConsolidated, 'total_views': value } = item
+            const dataLabel = routeConsolidated
+            return({ dataLabel, value })
+          })
+
+          const totalTimeByConsolidatedRoute = sortedTotalTimeByConsolidatedRoute.map(item => {
+            const { 'route_consolidated': routeConsolidated, 'total_time': value } = item
+            const dataLabel = routeConsolidated
+            return({ dataLabel, value })
+          })
+      
+          const totalViewsByConsolidatedRouteFinal = totalViewsByConsolidatedRoute.length > 5 ? exceededFormatted(totalViewsByConsolidatedRoute) : totalViewsByConsolidatedRoute
+          const totalTimeByConsolidatedRouteFinal = totalTimeByConsolidatedRoute.length > 5 ? exceededFormatted(totalTimeByConsolidatedRoute) : totalTimeByConsolidatedRoute
+
+          setTotalViewsByConsolidatedRouteFormatted(totalViewsByConsolidatedRouteFinal)
+          setTotalTimeByConsolidatedRouteFormatted(totalTimeByConsolidatedRouteFinal)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+    }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -226,16 +301,6 @@ const AdminView = () => {
 
           setStartDateViews(formatDateHuman(startDateJs, dateOptions))
           setEndDateViews(formatDateHuman(endDateJs, dateOptions))
-
-          const exceededFormatted = values => {
-            const categories = values.slice(0,4)
-            const others = values.slice(4)
-
-            const otherTotal = others.reduce((sum, { value }) => sum + value, 0)
-            categories.push({ dataLabel: 'Other', value: otherTotal})
-
-            return categories
-          }
   
           const { data: ttvbr } = result
           setTotalTimeViewsByRoute(ttvbr)
@@ -247,28 +312,6 @@ const AdminView = () => {
           const sortedTotalTimeByRoute = ttvbr.toSorted((a, b) => {
             return b.total_time - a.total_time
           })
-
-          const totalViewsByRoute = sortedTotalViewsByRoute.map(item => {
-            const { route, 'total_views': value } = item
-            // const routeSlug = route === '/' ? 'Root' : route.split('/')
-            // const dataLabel = formatSlug(routeSlug)
-            const dataLabel = route
-            return({ dataLabel, value })
-          })
-
-          const totalTimeByRoute = sortedTotalTimeByRoute.map(item => {
-            const { route, 'total_time': value } = item
-            // const routeSlug = route === '/' ? 'Root' : route.split('/')
-            // const dataLabel = formatSlug(routeSlug)
-            const dataLabel = route
-            return({ dataLabel, value })
-          })
-      
-          const totalViewsByRouteFinal = totalViewsByRoute.length > 5 ? exceededFormatted(totalViewsByRoute) : totalViewsByRoute
-          const totalTimeByRouteFinal = totalTimeByRoute.length > 5 ? exceededFormatted(totalTimeByRoute) : totalTimeByRoute
-
-          setTotalViewsByRouteFormatted(totalViewsByRouteFinal)
-          setTotalTimeByRouteFormatted(totalTimeByRouteFinal)
 
           const filteredTotalTimeViewsByRoute = ttvbr.filter(item => {
             const { route } = item
@@ -467,7 +510,7 @@ const AdminView = () => {
           <LayoutChart
               chart={ChartPie}
               chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-              chartData={totalViewsByRouteFormatted}
+              chartData={totalViewsByConsolidatedRouteFormatted}
               startAngle={-90}
               subtitle={`${startDateViews} to ${endDateViews}`}
               source="No Car Gravel"
