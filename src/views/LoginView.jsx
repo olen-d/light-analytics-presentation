@@ -8,7 +8,7 @@ const LoginView = () => {
       <p>
         View your site analytics and manage API keys.
       </p>
-      <div>
+      <div className="form-login-container">
         <FormLogin submitBtnContent="Log In"/>
       </div>
     </>

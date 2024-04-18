@@ -75,7 +75,7 @@ const FormLogin = ({ submitBtnContent = "Submit" }) => {
   return(
     <>
       <Grid container spacing={2} columns={{ xs: 4, sm: 8, md: 12 }}>
-        <Box sx={{ p: 2}} className="form-background">
+        <Box sx={{ p: 2 }} className="form-background">
           <Stack spacing={4}>
             <InputUsername
               errors={errors}

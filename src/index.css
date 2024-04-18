@@ -35,6 +35,8 @@ body {
 }
 
 .form-background {
+  margin-right: auto;
+  margin-left: auto;
   background-color: #f9eae1;
 }
 
