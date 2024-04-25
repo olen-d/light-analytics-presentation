@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
+import ChartBar from '../components/ChartBar'
 import ChartColumn from '../components/ChartColumn'
 import ChartPie from '../components/ChartPie'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
@@ -14,10 +15,14 @@ const AdminView = () => {
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
   const [bounceRate, setBounceRate] = useState(0)
+  const [startDateEntryViews, setStartDateEntryViews] = useState(null)
+  const [endDateEntryViews, setEndDateEntryViews] = useState(null)
   const [startDateViews, setStartDateViews] = useState(null)
   const [endDateViews, setEndDateViews] = useState(null)
   const [startDateVisits, setStartDateVisits] = useState(null)
   const [endDateVisits, setEndDateVisits] = useState(null)
+  const [totalEntriesByRoute, setTotalEntriesByRoute] = useState([])
+  const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
@@ -46,6 +51,10 @@ const AdminView = () => {
     return categories
   }
 
+  const exceededTruncated = (values, limit) => {
+    return values.slice(0, limit)
+  }
+
   const formatDateJs = date => {
     const dayJs = date.getDate()
     const monthJs = date.getMonth() + 1
@@ -70,6 +79,34 @@ const AdminView = () => {
       .join(' ')
   }
 
+  const truncateString = (string, maxLength) => {
+    if (string.length > maxLength) {
+      if (string.includes('-')) {
+        const coursesRemoved = string.replace('/courses', '')
+        if (coursesRemoved.length <= maxLength) { return coursesRemoved}
+        const words = coursesRemoved.split('-')
+
+        const truncator = () => {
+          const len = words.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.length,
+            0
+          )
+
+          if(len > maxLength) {
+            words.splice(-1,1)
+            return truncator()
+          } else {
+            return words.join('-')
+          }
+        }
+        return truncator()
+      }
+      // check for spaces
+  
+    } else {
+      return string
+    }
+  }
   useEffect(() => {
     const fetchData = async () => {
       const requestOptions = {
@@ -355,6 +392,59 @@ const AdminView = () => {
   }, [])
 
   useEffect(() => {
+    const fetchData = async () => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'api-key': apiKeyRead
+        }
+      }
+  
+      try {
+        const endDateJs = new Date()
+        const startDateJs = new Date()
+        startDateJs.setDate(startDateJs.getDate() - 6)
+        
+        const endDate = formatDateJs(endDateJs)
+        const startDate = formatDateJs(startDateJs)
+
+        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/entry?startdate=${startDate}&enddate=${endDate}`, requestOptions)
+        const result = await response.json()
+
+        if(result.status === 'ok') {
+          const dateOptions = {
+            month: 'long',
+            day: 'numeric'
+          }
+
+          setStartDateEntryViews(formatDateHuman(startDateJs, dateOptions))
+          setEndDateEntryViews(formatDateHuman(endDateJs, dateOptions))
+  
+          const { data: tebr } = result
+          setTotalEntriesByRoute(tebr)
+
+          const sortedTotalEntriesByRoute = tebr.toSorted((a, b) => {
+            return b.entry_page_count - a.entry_page_count
+          })
+
+          const totalSortedEntriesByRoute = sortedTotalEntriesByRoute.map(item => {
+            const { 'entry_page': dataLabel, 'entry_page_count': value } = item
+            const dlt = truncateString(dataLabel, 14)
+            return({ dataLabel: dlt, value })
+          })
+
+          const totalSortedEntriesByRouteFinal = totalSortedEntriesByRoute.length > 7 ? exceededTruncated(totalSortedEntriesByRoute, 7) : totalSortedEntriesByRoute
+
+          setTotalEntriesByRouteFormatted(totalSortedEntriesByRouteFinal)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
     const fetchData = async ()=> {
       try {
         const requestOptions = {
@@ -445,6 +535,15 @@ const AdminView = () => {
     }
     fetchData()
   }, [])
+
+  const ChartBarEntryPages = () => (
+    <ChartBar
+      categoryKey='dataLabel'
+      chartData={totalEntriesByRouteFormatted}
+      seriesName='Views'
+      startFromValue={0}
+    />
+  )
 
   const ChartColumnVisits = () => (
     <ChartColumn
@@ -537,6 +636,16 @@ const AdminView = () => {
             subtitle={`${startDateViews} to ${endDateViews}`}
             source="No Car Gravel"
             title="Courses by Viewing Time"
+          />
+        </Grid>
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
+      <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartBarEntryPages}
+            subtitle={`${startDateEntryViews} to ${endDateEntryViews}`}
+            source="No Car Gravel"
+            title="Entry Pages by Views"
           />
         </Grid>
       </Grid>
