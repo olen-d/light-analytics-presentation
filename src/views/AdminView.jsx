@@ -17,12 +17,16 @@ const AdminView = () => {
   const [bounceRate, setBounceRate] = useState(0)
   const [startDateEntryViews, setStartDateEntryViews] = useState(null)
   const [endDateEntryViews, setEndDateEntryViews] = useState(null)
+  const [startDateExitViews, setStartDateExitViews] = useState(null)
+  const [endDateExitViews, setEndDateExitViews] = useState(null)
   const [startDateViews, setStartDateViews] = useState(null)
   const [endDateViews, setEndDateViews] = useState(null)
   const [startDateVisits, setStartDateVisits] = useState(null)
   const [endDateVisits, setEndDateVisits] = useState(null)
   const [totalEntriesByRoute, setTotalEntriesByRoute] = useState([])
+  const [totalExitsByRoute, setTotalExitsByRoute] = useState([])
   const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
+  const [totalExitsByRouteFormatted, setTotalExitsByRouteFormatted] = useState([])
   const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
@@ -107,6 +111,7 @@ const AdminView = () => {
       return string
     }
   }
+
   useEffect(() => {
     const fetchData = async () => {
       const requestOptions = {
@@ -445,6 +450,59 @@ const AdminView = () => {
   }, [])
 
   useEffect(() => {
+    const fetchData = async () => {
+      const requestOptions = {
+        method: 'GET',
+        headers: {
+          'api-key': apiKeyRead
+        }
+      }
+  
+      try {
+        const endDateJs = new Date()
+        const startDateJs = new Date()
+        startDateJs.setDate(startDateJs.getDate() - 6)
+        
+        const endDate = formatDateJs(endDateJs)
+        const startDate = formatDateJs(startDateJs)
+
+        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/exit?startdate=${startDate}&enddate=${endDate}`, requestOptions)
+        const result = await response.json()
+
+        if(result.status === 'ok') {
+          const dateOptions = {
+            month: 'long',
+            day: 'numeric'
+          }
+
+          setStartDateExitViews(formatDateHuman(startDateJs, dateOptions))
+          setEndDateExitViews(formatDateHuman(endDateJs, dateOptions))
+  
+          const { data: texbr } = result
+          setTotalExitsByRoute(texbr)
+
+          const sortedTotalExitsByRoute = texbr.toSorted((a, b) => {
+            return b.exit_page_count - a.exit_page_count
+          })
+
+          const totalSortedExitsByRoute = sortedTotalExitsByRoute.map(item => {
+            const { 'exit_page': dataLabel, 'exit_page_count': value } = item
+            const dlt = truncateString(dataLabel, 14)
+            return({ dataLabel: dlt, value })
+          })
+
+          const totalSortedExitsByRouteFinal = totalSortedExitsByRoute.length > 7 ? exceededTruncated(totalSortedExitsByRoute, 7) : totalSortedExitsByRoute
+
+          setTotalExitsByRouteFormatted(totalSortedExitsByRouteFinal)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+    fetchData()
+  }, [])
+
+  useEffect(() => {
     const fetchData = async ()=> {
       try {
         const requestOptions = {
@@ -540,6 +598,15 @@ const AdminView = () => {
     <ChartBar
       categoryKey='dataLabel'
       chartData={totalEntriesByRouteFormatted}
+      seriesName='Views'
+      startFromValue={0}
+    />
+  )
+
+  const ChartBarExitPages = () => (
+    <ChartBar
+      categoryKey='dataLabel'
+      chartData={totalExitsByRouteFormatted}
       seriesName='Views'
       startFromValue={0}
     />
@@ -646,6 +713,14 @@ const AdminView = () => {
             subtitle={`${startDateEntryViews} to ${endDateEntryViews}`}
             source="No Car Gravel"
             title="Entry Pages by Views"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartBarExitPages}
+            subtitle={`${startDateExitViews} to ${endDateExitViews}`}
+            source="No Car Gravel"
+            title="Exit Pages by Views"
           />
         </Grid>
       </Grid>
