@@ -11,6 +11,7 @@ import {
 import AdminView from './views/AdminView'
 import HomeView from './views/HomeView'
 import LoginView from './views/LoginView'
+import SettingsView from './views/SettingsView'
 import SignupView from './views/SignupView'
 
 import ProtectedRoute from './components/ProtectedRoute'
@@ -39,9 +40,16 @@ const Routes = () => {
     { path: '/', element: <HomeView />},
     { path: '/admin',
       element:
-        <ProtectedRoute>
-          <AdminView />
-        </ProtectedRoute>
+        <ProtectedRoute />,
+        children: [
+          {
+            path: "",
+            element: <AdminView />
+          },
+          { path: "settings",
+            element: <SettingsView />
+          }
+        ]
     },
     { path: '/login', element: <LoginView />},
     { path: '/signup', element: <SignupView />},
