@@ -2,6 +2,8 @@ import * as React from 'react'
 
 import { Link, useNavigate } from 'react-router-dom'
 
+import { useAuth } from '../hooks/useAuth'
+
 import AppBar from '@mui/material/AppBar'
 import Box from '@mui/material/Box'
 import Toolbar from '@mui/material/Toolbar'
@@ -13,12 +15,24 @@ import Container from '@mui/material/Container'
 import Button from '@mui/material/Button'
 import MenuItem from '@mui/material/MenuItem'
 
-const pages = [{ name: 'Home', route: '/'}]
+
 
 const TheAppBar = () => {
+  const pages = [
+    { name: 'Home', route: '/', guarded: false },
+    { name: 'Dashboard', route: 'admin', guarded: true },
+    { name: 'Settings', route: '/admin/settings', guarded: true },
+  ]
+
   const [anchorElNav, setAnchorElNav] = React.useState(null)
 
+  const { isAuthenticated } = useAuth()
   const navigate = useNavigate()
+
+  const pagesToRender = pages.filter(element => {
+    const { guarded } = element
+    if (!guarded || guarded && isAuthenticated) { return element }
+  })
 
   const handleClick = e => {
     const { target: { value: route } } = e
@@ -79,7 +93,7 @@ const TheAppBar = () => {
                   onClose={handleCloseNavMenu}
                   sx={{ display: { xs: 'block', md: 'none' } }}
                 >
-                  {pages.map(({ name, route }) => (
+                  {pagesToRender.map(({ name, route }) => (
                     <MenuItem key={name} onClick={handleCloseNavMenu}>
                       <Typography textAlign="center"><Link to={route}>{name}</Link></Typography>
                     </MenuItem>
@@ -104,7 +118,7 @@ const TheAppBar = () => {
                 Light Analytics
               </Typography>
               <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                {pages.map(({ name, route }) => (
+                {pagesToRender.map(({ name, route }) => (
                   <Button
                     key={name}
                     value={route}
