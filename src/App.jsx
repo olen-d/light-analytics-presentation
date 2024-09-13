@@ -13,6 +13,7 @@ import HomeView from './views/HomeView'
 import LoginView from './views/LoginView'
 import SettingsView from './views/SettingsView'
 import SignupView from './views/SignupView'
+import VisitorsView from './views/VisitorsView'
 
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -48,6 +49,9 @@ const Routes = () => {
           },
           { path: "settings",
             element: <SettingsView />
+          },
+          { path: "visitors",
+            element: <VisitorsView />
           }
         ]
     },

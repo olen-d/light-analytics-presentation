@@ -21,7 +21,8 @@ const TheAppBar = () => {
   const pages = [
     { name: 'Home', route: '/', guarded: false },
     { name: 'Dashboard', route: 'admin', guarded: true },
-    { name: 'Settings', route: '/admin/settings', guarded: true },
+    { name: 'Visitors', route: '/admin/visitors', guarded: true },
+    { name: 'Settings', route: '/admin/settings', guarded: true }
   ]
 
   const [anchorElNav, setAnchorElNav] = React.useState(null)

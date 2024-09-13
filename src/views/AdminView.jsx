@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import ChartBar from '../components/ChartBar'
 import ChartColumn from '../components/ChartColumn'
+import ChartLine from '../components/ChartLine'
 import ChartPie from '../components/ChartPie'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
@@ -42,6 +43,10 @@ const AdminView = () => {
   const [totalVisits, setTotalVisits] = useState(0)
   const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
   const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
+// Monthly 
+  const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
+  const [totalVisitsByMonthFormatted, setTotalVisitsByMonthFormatted] = useState([])
+// End Monthly
   const [uniqueVisits, setUniqueVisits] = useState(0)
 
   // Utility Functions
@@ -501,7 +506,63 @@ const AdminView = () => {
     }
     fetchData()
   }, [])
+// Monthly
+useEffect(() => {
+  const fetchData = async () => {
+    const requestOptions = {
+      method: 'GET',
+      headers: {
+        'api-key': apiKeyRead
+      }
+    }
 
+    try {
+      const endDateJs = new Date()
+      const startDateJs = new Date()
+      startDateJs.setDate(startDateJs.getDate() - 6)
+      
+      const endDate = formatDateJs(endDateJs)
+      const startDate = formatDateJs(startDateJs)
+
+      const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/by-month`, requestOptions)
+      const result = await response.json()
+
+      if(result.status === 'ok') {
+        // const dateOptions = {
+        //   month: 'long',
+        //   day: 'numeric'
+        // }
+
+        const { data: { totalVisitsByMonth : tvbm } } = result
+        setTotalVisitsByMonth(tvbm)
+
+        // const sortedTotalExitsByRoute = texbr.toSorted((a, b) => {
+        //   return b.exit_page_count - a.exit_page_count
+        // })
+
+        const totalVisitsByMonthFinal = tvbm.map(item => {
+          const { 'month': yearMonth, 'count': value } = item
+
+          const dayParts = yearMonth.split('-')
+          const jsDate = new Date(dayParts[0], dayParts[1] - 1)
+
+          const options = { month: 'short' }
+          const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
+          const dateFormatted = dateTimeFormat.format(jsDate)
+          return({ month: dateFormatted, value })
+        })
+
+        // const totalSortedExitsByRouteFinal = totalSortedExitsByRoute.length > 7 ? exceededTruncated(totalSortedExitsByRoute, 7) : totalSortedExitsByRoute
+
+        setTotalVisitsByMonthFormatted(totalVisitsByMonthFinal)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  fetchData()
+}, [])
+// End Monthly
   useEffect(() => {
     const fetchData = async ()=> {
       try {
@@ -642,6 +703,16 @@ const AdminView = () => {
     />
   )
 
+  const ChartLineMonthlyVisits = () => (
+    <ChartLine
+      categoryName='Months'
+      categoryKey='month'
+      chartData={totalVisitsByMonthFormatted}
+      seriesName='Visits'
+      startFromValue={0}
+    />
+  )
+
   return(
     <>
       <h1 className="admin-lead extended">Administration</h1>
@@ -721,6 +792,14 @@ const AdminView = () => {
             subtitle={`${startDateExitViews} to ${endDateExitViews}`}
             source="No Car Gravel"
             title="Exit Pages by Views"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutChart
+            chart={ChartLineMonthlyVisits}
+            subtitle="Testing"
+            source="No Car Gravel"
+            title="Visits by Month"
           />
         </Grid>
       </Grid>

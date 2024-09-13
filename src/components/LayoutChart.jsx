@@ -17,15 +17,15 @@ const LayoutChart = ({
   title,
   source
 }) => {
- return (
-  <div className="layout-chart-container">
-    <TitleChart title={title} />
-    <SubtitleChart subtitle={subtitle} />
-    <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
-    <LegendChart chartColors={chartColors} chartData={chartData} />
-    {source && <SourceChart source={source} />}
-  </div>
- )
+  return (
+    <div className="layout-chart-container">
+      <TitleChart title={title} />
+      <SubtitleChart subtitle={subtitle} />
+      <Chart chartColors={chartColors} chartData={chartData} startAngle={startAngle} />
+      <LegendChart chartColors={chartColors} chartData={chartData} />
+      {source && <SourceChart source={source} />}
+    </div>
+  )
 }
 
 const { array, number, string } = PropTypes
