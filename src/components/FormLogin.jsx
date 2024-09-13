@@ -34,10 +34,6 @@ const FormLogin = ({ submitBtnContent = "Submit" }) => {
     }
   }, [errors])
 
-  useEffect(() => {
-    initializeFields({ 'plaintextPassword': 'albSrt22!' })
-  },[])
-
   const apiKey = import.meta.env.VITE_ANALYTICS_API_KEY
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
