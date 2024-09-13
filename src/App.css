@@ -62,7 +62,12 @@
   fill: #333;
 }
 
-.chart-bar-text-label-caetegory-name {
+.chart-bar-text-label-category {
+  font-size: 0.8rem;
+  fill: #333;
+}
+
+.chart-bar-text-label-category-name {
   font-size: 0.7rem;
   fill: #333;
 }
