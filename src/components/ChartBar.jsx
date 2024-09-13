@@ -146,7 +146,7 @@ const ChartBar = (
                 className='chart-series-1'
               />
               <text
-                className='chart-bar-text-label-caetegory-name'
+                className='chart-bar-text-label-category'
                 // x={x + columnPlotWidth / 2}
                 // y={xAxisY + 24}
                 x={x0 - 10}

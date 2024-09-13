@@ -87,6 +87,18 @@
   fill: #337f33;
 }
 
+.chart-line-series-1 {
+  fill: none;
+  stroke: #337f33;
+  stroke-width: 5;
+}
+
+.chart-line-point-series-1 {
+  fill: white;
+  stroke: #337f33;
+  stroke-width: 4;
+}
+
 .display-statistic-number {
   background-color: #f8f8f8;
 }
