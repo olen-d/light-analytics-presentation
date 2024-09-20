@@ -8,6 +8,16 @@ import SubtitleChart from '../components/SubtitleChart'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
+// Begin Table Stuff
+import Table from '@mui/material/Table'
+import TableBody from '@mui/material/TableBody'
+import TableCell from '@mui/material/TableCell'
+import TableContainer from '@mui/material/TableContainer'
+import TableHead from'@mui/material/TableHead'
+import TableRow from '@mui/material/TableRow'
+import Paper from '@mui/material/Paper'
+// End Table Stuff
+
 const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
 const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
@@ -72,6 +82,77 @@ const VisitorsView = () => {
     }
   }
 
+  const MonthlyVisitsSummary = () => {
+    const url = `${baseAnalyticsApiUrl}/api/v1/sessions/summary/by-month`
+    const requestConfig = {
+      apiKey: apiKeyRead,
+      method: 'GET',
+      url
+    }
+
+    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+    if (isLoading) {
+      return 'Loading...'
+    } else {
+      const { data: { summaryByMonth } } = fetchResult
+
+      const headings = [
+        'Month',
+        'Total Visits',
+        'Unique Visits',
+        'Single Page Sessions',
+        'Bounce Rate'
+      ]
+
+      const formatMonth = m => {
+        const [year, month] = m.split('-')
+        const monthJsDate = new Date(year, Number(month) -1)
+
+        const monthOptions = month === '01' ? { month: 'long', year: 'numeric' } : { month: 'long' }
+        const monthFormat = new Intl.DateTimeFormat('en-US', monthOptions)
+        const monthFormatted = monthFormat.format(monthJsDate)
+
+        return monthFormatted
+      }
+
+      const rows = summaryByMonth.map(element => {
+        const { month, totalVisits, uniqueVisits, singlePageSessions, bounceRate } = element
+        const monthFormatted = formatMonth(month)
+        const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
+        return({ id: month, monthFormatted, totalVisits, uniqueVisits, singlePageSessions, bounceRateFormatted })
+      })
+
+      return (
+        <TableContainer component={Paper}>
+          <Table sx={{ minWidth: 650 }}>
+            <TableHead>
+              <TableRow>
+              {headings.map((element, index) => (
+                <TableCell key={index} align="center">{element}</TableCell>
+              ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {rows.map(element => (
+                <TableRow
+                  key={element.id}
+                >
+                  <TableCell component="th" scope="row">
+                    {element.monthFormatted}
+                  </TableCell>
+                  <TableCell align="right">{element.totalVisits}</TableCell>
+                  <TableCell align="right">{element.uniqueVisits}</TableCell>
+                  <TableCell align="right">{element.singlePageSessions}</TableCell>
+                  <TableCell align="right">{element.bounceRateFormatted}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )
+    }
+  }
+
   useEffect(() => {
     const screen = {
       xs: null,
@@ -107,6 +188,7 @@ const VisitorsView = () => {
           />
         </Grid>
       </Grid>
+      <MonthlyVisitsSummary />
     </div>
   )
 }
