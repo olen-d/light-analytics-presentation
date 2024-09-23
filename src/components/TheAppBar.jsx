@@ -22,6 +22,7 @@ const TheAppBar = () => {
     { name: 'Home', route: '/', guarded: false },
     { name: 'Dashboard', route: 'admin', guarded: true },
     { name: 'Visitors', route: '/admin/visitors', guarded: true },
+    { name: 'Content', route: '/admin/content', guarded: true },
     { name: 'Settings', route: '/admin/settings', guarded: true }
   ]
 

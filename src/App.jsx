@@ -9,6 +9,7 @@ import {
 } from 'react-router-dom'
 
 import AdminView from './views/AdminView'
+import ContentView from './views/ContentView'
 import HomeView from './views/HomeView'
 import LoginView from './views/LoginView'
 import SettingsView from './views/SettingsView'
@@ -46,6 +47,10 @@ const Routes = () => {
           {
             path: "",
             element: <AdminView />
+          },
+          {
+            path: "content",
+            element: <ContentView />
           },
           { path: "settings",
             element: <SettingsView />
