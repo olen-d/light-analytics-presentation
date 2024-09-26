@@ -5,6 +5,7 @@ import useFetchData from '../hooks/useFetchData'
 import ChartLine from '../components/ChartLine'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
+import TableBasic from '../components/TableBasic'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -72,6 +73,71 @@ const ContentView = () => {
     }
   }
 
+  const ContentViewsSummary = () => {
+    const url = `${baseAnalyticsApiUrl}/api/v1/pages/summary/by-route`
+    const requestConfig = {
+      apiKey: apiKeyRead,
+      method: 'GET',
+      url
+    }
+
+    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+    if (isLoading) {
+      return 'Loading...'
+    } else {
+      const { data: { contentSummaryByRoute } } = fetchResult
+
+      const formatDuration = (duration, output)  => {
+        const durationSeconds = Math.round(duration / 1000)
+
+        if (output === 'hh:mm:ss') {
+          const totalHours = Math.floor(durationSeconds / 3600)
+          const remainderSeconds = durationSeconds % 3600
+          const totalMinutes = Math.floor(remainderSeconds / 60)
+          const totalSeconds = remainderSeconds % 60
+
+          const hh = totalHours.toString().padStart(2, '0')
+          const mm = totalMinutes.toString().padStart(2, '0')
+          const ss = totalSeconds.toString().padStart(2, '0')
+
+          return (`${hh}:${mm}:${ss}`)
+        }
+      }
+
+      const headings = [
+        'Route',
+        'Page Views',
+        'Unique Page Views',
+        'Average Time on Page',
+        'Entrances',
+        'Exits',
+        'Bounce Rate'
+      ]
+
+      const rowKeys = contentSummaryByRoute.map(element => {
+        const { route: key } = element
+        return key
+      })
+
+      const rows = contentSummaryByRoute.map(element => {
+        const {
+          route,
+          totalViews,
+          uniquePageViews,
+          averageTimeOnPage,
+          entrances,
+          exits,
+          bounceRate
+        } = element
+        const averageTimeOnPageFormatted = formatDuration(averageTimeOnPage, 'hh:mm:ss')
+        const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
+        return([route, totalViews, uniquePageViews, averageTimeOnPageFormatted, entrances, exits, bounceRateFormatted])
+      })
+
+      return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
+    }
+  }
+
   useEffect(() => {
     const screen = {
       xs: null,
@@ -107,6 +173,7 @@ const ContentView = () => {
           />
         </Grid>
       </Grid>
+      <ContentViewsSummary />
     </div>
   )
 }

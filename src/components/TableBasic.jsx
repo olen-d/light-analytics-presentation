@@ -29,7 +29,7 @@ const TableBasic = ({
               key={rowKeys[index]}
             >
               {element.map((cell, index) => (
-                index === 0 ? <TableCell component="th" scope="row">{cell}</TableCell> : <TableCell align="right">{cell}</TableCell>
+                index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
               ))}
             </TableRow>
           ))}
