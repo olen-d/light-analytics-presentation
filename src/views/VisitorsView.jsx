@@ -3,9 +3,10 @@ import { useEffect, useState } from 'react'
 import useFetchData from '../hooks/useFetchData'
 
 import ChartLine from '../components/ChartLine'
+import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
-import TableBasic from '../components/TableBasic'
+import TableSort from '../components/TableSort'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -73,8 +74,63 @@ const VisitorsView = () => {
     }
   }
 
-  const MonthlyVisitsSummary = () => {
-    const url = `${baseAnalyticsApiUrl}/api/v1/sessions/summary/by-month`
+  // const MonthlyVisitsSummary = () => {
+  //   const url = `${baseAnalyticsApiUrl}/api/v1/sessions/summary/by-month`
+  //   const requestConfig = {
+  //     apiKey: apiKeyRead,
+  //     method: 'GET',
+  //     url
+  //   }
+
+  //   const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+  //   if (isLoading) {
+  //     return 'Loading...'
+  //   } else {
+  //     const { data: { summaryByMonth } } = fetchResult
+
+  //     const headings = [
+  //       'Month',
+  //       'Total Visits',
+  //       'Unique Visits',
+  //       'Single Page Sessions',
+  //       'Bounce Rate'
+  //     ]
+
+  //     const formatMonth = m => {
+  //       const [year, month] = m.split('-')
+  //       const monthJsDate = new Date(year, Number(month) -1)
+
+  //       const monthOptions = { month: 'long', year: 'numeric' }
+  //       const monthFormat = new Intl.DateTimeFormat('en-US', monthOptions)
+  //       const monthFormatted = monthFormat.format(monthJsDate)
+
+  //       return monthFormatted
+  //     }
+
+  //     const rowKeys = summaryByMonth.map(element => {
+  //       const { month: key } = element
+  //       return key
+  //     })
+
+  //     const rows = summaryByMonth.map(element => {
+  //       const { month, totalVisits, uniqueVisits, singlePageSessions, bounceRate } = element
+  //       const monthFormatted = formatMonth(month)
+  //       const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
+  //       return([month, monthFormatted, totalVisits, uniqueVisits, singlePageSessions, bounceRateFormatted])
+  //     })
+
+  //     return(<TableSort headings={headings} rows={rows} isFirstColVisible={false} rowKeys={rowKeys} />)
+  //   }
+  // }
+ 
+  const WidgetStatistics = ({
+    endpoint,
+    statisticFormat = 'none',
+    statisticKey,
+    statisticName
+  }) => {
+    const url = `${baseAnalyticsApiUrl}/${endpoint}`
+
     const requestConfig = {
       apiKey: apiKeyRead,
       method: 'GET',
@@ -85,40 +141,17 @@ const VisitorsView = () => {
     if (isLoading) {
       return 'Loading...'
     } else {
-      const { data: { summaryByMonth } } = fetchResult
+      if (fetchResult.status === 'ok') {
+        const statisticValue = fetchResult.data[statisticKey]
 
-      const headings = [
-        'Month',
-        'Total Visits',
-        'Unique Visits',
-        'Single Page Sessions',
-        'Bounce Rate'
-      ]
-
-      const formatMonth = m => {
-        const [year, month] = m.split('-')
-        const monthJsDate = new Date(year, Number(month) -1)
-
-        const monthOptions = month === '01' ? { month: 'long', year: 'numeric' } : { month: 'long' }
-        const monthFormat = new Intl.DateTimeFormat('en-US', monthOptions)
-        const monthFormatted = monthFormat.format(monthJsDate)
-
-        return monthFormatted
+        return(
+          <DisplayStatisticNumber
+            format={statisticFormat}
+            statisticName={statisticName}
+            statisticValue={statisticValue}
+          />
+        )
       }
-
-      const rowKeys = summaryByMonth.map(element => {
-        const { month: key } = element
-        return key
-      })
-
-      const rows = summaryByMonth.map(element => {
-        const { month, totalVisits, uniqueVisits, singlePageSessions, bounceRate } = element
-        const monthFormatted = formatMonth(month)
-        const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
-        return([monthFormatted, totalVisits, uniqueVisits, singlePageSessions, bounceRateFormatted])
-      })
-
-      return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
     }
   }
 
@@ -157,7 +190,31 @@ const VisitorsView = () => {
           />
         </Grid>
       </Grid>
-      <MonthlyVisitsSummary />
+      {/* <MonthlyVisitsSummary /> */}
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics 
+            endpoint="api/v1/sessions"
+            statisticKey="totalVisits"
+            statisticName="Total Visits"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+        <WidgetStatistics 
+            endpoint="api/v1/sessions/unique"
+            statisticKey="uniqueVisits"
+            statisticName="Unique Visits"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+        <WidgetStatistics 
+            endpoint="api/v1/sessions/bounce-rate"
+            statisticFormat="percent"
+            statisticKey="bounceRate"
+            statisticName="Bounce Rate"
+          />
+        </Grid> 
+      </Grid>
     </div>
   )
 }
