@@ -203,14 +203,22 @@ const VisitorsView = () => {
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-        <WidgetStatistics 
+          <WidgetStatistics 
             endpoint="api/v1/sessions/unique"
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-        <WidgetStatistics 
+          <WidgetStatistics 
+            endpoint="api/v1/pages/time-on-pages/average"
+            statisticFormat="elapsedTime"
+            statisticKey="timeOnPageAverage"
+            statisticName="Visit Duration"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics 
             endpoint="api/v1/sessions/bounce-rate"
             statisticFormat="percent"
             statisticKey="bounceRate"
