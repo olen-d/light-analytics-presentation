@@ -12,8 +12,16 @@ const DisplayStatisticNumber = ({
 }) => {
   const converted = () => {
     switch (format) {
+      case 'elapsedTime':
+        const totalSeconds = Math.round(statisticValue / 1000)
+        const hours = Math.floor(totalSeconds / 3600)
+        const minutes = Math.floor(totalSeconds / 60) % 60
+        const seconds = totalSeconds % 60
+        return { hours, minutes, seconds }
+        break
       case 'percent':
         return statisticValue * 100
+        break
       default:
         return statisticValue
     }
@@ -23,6 +31,7 @@ const DisplayStatisticNumber = ({
     switch (round) {
       case 0:
         return Math.round(converted())
+        break
       default:
         return converted()
     }
@@ -30,8 +39,13 @@ const DisplayStatisticNumber = ({
 
   const formatted = () => {
     switch (format) {
+      case 'elapsedTime':
+        const  { hours, minutes, seconds } = converted()
+        return `${hours > 0 ? hours+'h' : ''} ${minutes > 0 ? minutes+'m' : ''} ${seconds}s`
+        break
       case 'percent':
         return `${rounded()}%`
+        break
       case 'none':
       default:
         return rounded()
