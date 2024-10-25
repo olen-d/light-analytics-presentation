@@ -31,7 +31,9 @@ const DisplayStatisticNumber = ({
     const expanded = 10 ** round * converted()
     const rounded = Math.round(expanded)
     const compressed = 10 ** (round * -1) * rounded
-    return compressed
+    const fixed = compressed.toFixed(round)
+    const float = parseFloat(fixed)
+    return float
   }
 
   const formatted = () => {
