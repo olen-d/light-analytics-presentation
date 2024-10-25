@@ -28,13 +28,10 @@ const DisplayStatisticNumber = ({
   }
 
   const rounded = () => {
-    switch (round) {
-      case 0:
-        return Math.round(converted())
-        break
-      default:
-        return converted()
-    }
+    const expanded = 10 ** round * converted()
+    const rounded = Math.round(expanded)
+    const compressed = 10 ** (round * -1) * rounded
+    return compressed
   }
 
   const formatted = () => {
