@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import useFetchData from '../hooks/useFetchData'
 
 import ChartLine from '../components/ChartLine'
+import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
 import TableBasic from '../components/TableBasic'
@@ -138,6 +139,43 @@ const ContentView = () => {
     }
   }
 
+  const WidgetStatistics = ({
+    endpoint,
+    round = 0,
+    statisticFormat = 'none',
+    statisticKey,
+    statisticName
+  }) => {
+    const url = `${baseAnalyticsApiUrl}/${endpoint}`
+
+    const requestConfig = {
+      apiKey: apiKeyRead,
+      method: 'GET',
+      url
+    }
+
+    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+    if (isLoading) {
+      return 'Loading...'
+    } else {
+      if (fetchResult.status === 'ok') {
+        const statisticValue = fetchResult.data[statisticKey]
+        const { data: { startDate, endDate }, } = fetchResult
+
+        return(
+          <DisplayStatisticNumber
+            endDate={endDate}
+            format={statisticFormat}
+            round={round}
+            startDate={startDate}
+            statisticName={statisticName}
+            statisticValue={statisticValue}
+          />
+        )
+      }
+    }
+  }
+
   useEffect(() => {
     const screen = {
       xs: null,
@@ -173,7 +211,36 @@ const ContentView = () => {
           />
         </Grid>
       </Grid>
-      <ContentViewsSummary />
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics 
+            endpoint="api/v1/pages"
+            statisticKey="totalViews"
+            statisticName="Total Views"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics 
+            endpoint="api/v1/pages/views/per-visit"
+            round={1}
+            statisticKey="viewsPerVisit"
+            statisticName="Views Per Visit"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics 
+            endpoint="api/v1/pages/time/per-view"
+            statisticFormat="elapsedTime"
+            statisticKey="timePerPageview"
+            statisticName="Time Per Pageview"
+          />
+        </Grid>
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid>
+          <ContentViewsSummary />
+        </Grid>
+      </Grid>
     </div>
   )
 }
