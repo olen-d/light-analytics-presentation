@@ -6,7 +6,7 @@ import ChartLine from '../components/ChartLine'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
-import TableBasic from '../components/TableBasic'
+import TableSort from '../components/TableSort'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -135,7 +135,7 @@ const ContentView = () => {
         return([route, totalViews, uniquePageViews, averageTimeOnPageFormatted, entrances, exits, bounceRateFormatted])
       })
 
-      return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
+      return(<TableSort headings={headings} rows={rows} rowKeys={rowKeys} />)
     }
   }
 

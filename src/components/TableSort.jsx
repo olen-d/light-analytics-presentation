@@ -16,7 +16,6 @@ import { visuallyHidden } from '@mui/utils'
 
 const TableSort = ({
   headings,
-  isFirstColVisible = true,
   rows,
   rowKeys
 }) => {
@@ -60,47 +59,48 @@ const TableSort = ({
   )
 
   return (
-    <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }}>
-        <TableHead>
-          <TableRow>
-          {headings.map((element, index) => (
-            <TableCell
-              key={index}
-              align="center"
-              sortDirection={orderBy === index ? order : false}
-            >
-              <TableSortLabel
-                active={orderBy === index}
-                direction={orderBy === index ? order : 'asc'}
-                onClick={createSortHandler(index)}
+    <div className="table-sort">
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }}>
+          <TableHead>
+            <TableRow>
+            {headings.map((element, index) => (
+              <TableCell
+                key={index}
+                align="center"
+                sortDirection={orderBy === index ? order : false}
               >
-                {element}
-                {orderBy === index ? (
-                  <Box component="span" sx={visuallyHidden}>
-                    {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
-                  </Box>
-                ) : null}
-              </TableSortLabel>
-            </TableCell>
-          ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {visibleRows.map((element, index) => (
-            <TableRow
-              key={rowKeys[index]}
-            >
-              {element.map((cell, index) => (
-                index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
-              ))}
+                <TableSortLabel
+                  active={orderBy === index}
+                  direction={orderBy === index ? order : 'asc'}
+                  onClick={createSortHandler(index)}
+                >
+                  {element}
+                  {orderBy === index ? (
+                    <Box component="span" sx={visuallyHidden}>
+                      {order === 'desc' ? 'sorted descending' : 'sorted ascending'}
+                    </Box>
+                  ) : null}
+                </TableSortLabel>
+              </TableCell>
+            ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {visibleRows.map((element, index) => (
+              <TableRow
+                key={rowKeys[index]}
+              >
+                {element.map((cell, index) => (
+                  index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   )
-  
 }
 
 const { array, bool } = PropTypes
