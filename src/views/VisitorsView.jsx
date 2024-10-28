@@ -6,7 +6,7 @@ import ChartLine from '../components/ChartLine'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
-import TableSort from '../components/TableSort'
+import TableBasic from '../components/TableBasic'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -123,6 +123,45 @@ const VisitorsView = () => {
   //   }
   // }
  
+  const CountTable = ({
+    endpoint,
+    countKey,
+    countName,
+    itemKey,
+    itemName,
+    listKey
+  }) => {
+    const url = `${baseAnalyticsApiUrl}/${endpoint}`
+
+    const requestConfig = {
+      apiKey: apiKeyRead,
+      method: 'GET',
+      url
+    }
+
+    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+    if (isLoading) {
+      return 'Loading...'
+    } else {
+      if (fetchResult.status === 'ok') {
+        const headings = [itemName, countName]
+        const rowsData = fetchResult.data[listKey]
+
+        const rowKeys = rowsData.map(element => {
+          return element[itemKey]
+        })
+
+        const rows = rowsData.map(element => {
+          const item = element[itemKey]
+          const count = element[countKey]
+          return [item, count]
+        })
+
+        return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
+      }
+    }
+  }
+
   const WidgetStatistics = ({
     endpoint,
     statisticFormat = 'none',
@@ -224,6 +263,23 @@ const VisitorsView = () => {
             statisticKey="bounceRate"
             statisticName="Bounce Rate"
           />
+        </Grid> 
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={12} md={6}>
+          <div className="top-table">
+            <div className="table-text-title">
+              Top Referrers
+            </div>
+            <CountTable
+              endpoint="api/v1/sessions/referrers"
+              countKey="count"
+              countName="Visits"
+              itemKey="referrer"
+              itemName="Referrers"
+              listKey="referrers"
+            />
+          </div>
         </Grid> 
       </Grid>
     </div>

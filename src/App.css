@@ -50,11 +50,12 @@
   margin-bottom: 0.5rem;
 }
 
-.chart-text-title {
+.chart-text-title,
+.table-text-title {
   font-size: 1.5rem;
   color: #333;
   text-align: left;
-  margin-bottom: 0.1rem;;
+  margin-bottom: 0.1rem;
 }
 
 .chart-text-label-category-name {
@@ -149,4 +150,12 @@
 
 .table-sort {
   padding-top: 4rem;
+}
+
+.table-text-title {
+  padding-bottom: 1rem;
+}
+
+.top-table {
+  padding-top: 3rem;
 }

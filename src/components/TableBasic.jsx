@@ -15,7 +15,7 @@ const TableBasic = ({
 }) => {
   return (
     <TableContainer component={Paper}>
-      <Table sx={{ minWidth: 650 }}>
+      <Table>
         <TableHead>
           <TableRow>
           {headings.map((element, index) => (
@@ -37,7 +37,6 @@ const TableBasic = ({
       </Table>
     </TableContainer>
   )
-  
 }
 
 const { array } = PropTypes
