@@ -129,8 +129,25 @@ const VisitorsView = () => {
     countName,
     itemKey,
     itemName,
+    itemNameFormat = 'none',
     listKey
   }) => {
+    const formatItemName = item => {
+      let itemNameFormatted = null
+
+      switch (itemNameFormat) {
+        case 'language':
+          const languageNames = new Intl.DisplayNames(['eng'], { type: 'language' })
+          itemNameFormatted = languageNames.of(item)
+          break
+        case 'none':
+        default:
+          itemNameFormatted = item
+      }
+
+      return itemNameFormatted
+    }
+
     const url = `${baseAnalyticsApiUrl}/${endpoint}`
 
     const requestConfig = {
@@ -153,8 +170,9 @@ const VisitorsView = () => {
 
         const rows = rowsData.map(element => {
           const item = element[itemKey]
+          const itemFormatted = formatItemName(item)
           const count = element[countKey]
-          return [item, count]
+          return [itemFormatted, count]
         })
 
         return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
@@ -274,10 +292,26 @@ const VisitorsView = () => {
             <CountTable
               endpoint="api/v1/sessions/referrers"
               countKey="count"
-              countName="Visits"
+              countName="Visitors"
               itemKey="referrer"
               itemName="Referrers"
               listKey="referrers"
+            />
+          </div>
+        </Grid>
+        <Grid xs={12} md={6}>
+          <div className="top-table">
+            <div className="table-text-title">
+              Top Languages
+            </div>
+            <CountTable
+              endpoint="api/v1/sessions/languages"
+              countKey="count"
+              countName="Visitors"
+              itemKey="language"
+              itemName="Languages"
+              itemNameFormat="language"
+              listKey="languages"
             />
           </div>
         </Grid> 
