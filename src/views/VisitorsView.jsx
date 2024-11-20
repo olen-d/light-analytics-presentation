@@ -7,6 +7,7 @@ import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SubtitleChart from '../components/SubtitleChart'
 import TableBasic from '../components/TableBasic'
+import WidgetStatistics from '../components/WidgetStatistics'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -180,40 +181,7 @@ const VisitorsView = () => {
     }
   }
 
-  const WidgetStatistics = ({
-    endpoint,
-    statisticFormat = 'none',
-    statisticKey,
-    statisticName
-  }) => {
-    const url = `${baseAnalyticsApiUrl}/${endpoint}`
 
-    const requestConfig = {
-      apiKey: apiKeyRead,
-      method: 'GET',
-      url
-    }
-
-    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
-    if (isLoading) {
-      return 'Loading...'
-    } else {
-      if (fetchResult.status === 'ok') {
-        const statisticValue = fetchResult.data[statisticKey]
-        const { data: { startDate, endDate }, } = fetchResult
-
-        return(
-          <DisplayStatisticNumber
-            endDate={endDate}
-            format={statisticFormat}
-            startDate={startDate}
-            statisticName={statisticName}
-            statisticValue={statisticValue}
-          />
-        )
-      }
-    }
-  }
 
   useEffect(() => {
     const screen = {
@@ -253,21 +221,27 @@ const VisitorsView = () => {
       {/* <MonthlyVisitsSummary /> */}
       <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions"
             statisticKey="totalVisits"
             statisticName="Total Visits"
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/unique"
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages/time-on-pages/average"
             statisticFormat="elapsedTime"
             statisticKey="timeOnPageAverage"
@@ -275,7 +249,9 @@ const VisitorsView = () => {
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/bounce-rate"
             statisticFormat="percent"
             statisticKey="bounceRate"
