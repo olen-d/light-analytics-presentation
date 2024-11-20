@@ -6,8 +6,8 @@ import ChartBar from '../components/ChartBar'
 import ChartColumn from '../components/ChartColumn'
 import ChartLine from '../components/ChartLine'
 import ChartPie from '../components/ChartPie'
-import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
+import WidgetStatistics from '../components/WidgetStatistics'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -15,7 +15,6 @@ const AdminView = () => {
   const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
-  const [bounceRate, setBounceRate] = useState(0)
   const [startDateEntryViews, setStartDateEntryViews] = useState(null)
   const [endDateEntryViews, setEndDateEntryViews] = useState(null)
   const [startDateExitViews, setStartDateExitViews] = useState(null)
@@ -28,7 +27,6 @@ const AdminView = () => {
   const [totalExitsByRoute, setTotalExitsByRoute] = useState([])
   const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
   const [totalExitsByRouteFormatted, setTotalExitsByRouteFormatted] = useState([])
-  const [totalSinglePageSessions, setTotalSinglePageSessions] = useState(0)
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
   const [totalTimeByConsolidatedRouteFormatted, setTotalTimeByConsolidatedRouteFormatted] = useState([])
@@ -40,14 +38,12 @@ const AdminView = () => {
   const [totalViewsByDay, setTotalViewsByDay] = useState([])
   const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
   const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
-  const [totalVisits, setTotalVisits] = useState(0)
   const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
   const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
 // Monthly 
   const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
   const [totalVisitsByMonthFormatted, setTotalVisitsByMonthFormatted] = useState([])
 // End Monthly
-  const [uniqueVisits, setUniqueVisits] = useState(0)
 
   // Utility Functions
   const exceededFormatted = values => {
@@ -563,97 +559,6 @@ useEffect(() => {
   fetchData()
 }, [])
 // End Monthly
-  useEffect(() => {
-    const fetchData = async ()=> {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            'api-key': apiKeyRead
-          }
-        }
-          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/bounce-rate`, requestOptions)
-          const result = await response.json()
-
-          if (result.status === 'ok') {
-            const { data: { bounceRate: br }, } = result
-            setBounceRate(br)
-          }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async ()=> {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            'api-key': apiKeyRead
-          }
-        }
-          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/unique`, requestOptions)
-          const result = await response.json()
-
-          if (result.status === 'ok') {
-            const { data: { uniqueVisits: uv }, } = result
-            setUniqueVisits(uv)
-          }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async ()=> {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            'api-key': apiKeyRead
-          }
-        }
-          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions`, requestOptions)
-          const result = await response.json()
-
-          if (result.status === 'ok') {
-            const { data: { totalVisits: tv }, } = result
-            setTotalVisits(tv)
-          }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async ()=> {
-      try {
-        const requestOptions = {
-          method: 'GET',
-          headers: {
-            'api-key': apiKeyRead
-          }
-        }
-          const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/single-page`, requestOptions)
-          const result = await response.json()
-
-          if (result.status === 'ok') {
-            const { data: { totalSinglePageSessions: tsps }, } = result
-            setTotalSinglePageSessions(tsps)
-          }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
 
   const ChartBarEntryPages = () => (
     <ChartBar
@@ -803,40 +708,45 @@ useEffect(() => {
           />
         </Grid>
       </Grid>
-      <Grid container spacing={2}>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <div>
-            <DisplayStatisticNumber
-              statisticName='Total Visits'
-              statisticValue={totalVisits}
-            />
-          </div>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint="api/v1/sessions"
+            statisticKey="totalVisits"
+            statisticName="Total Visits"
+          />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <div>
-            <DisplayStatisticNumber
-              statisticName='Unique Visits'
-              statisticValue={uniqueVisits}
-            />
-          </div>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint="api/v1/sessions/unique"
+            statisticKey="uniqueVisits"
+            statisticName="Unique Visits"
+          />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <div>
-            <DisplayStatisticNumber
-              statisticName='Single Page Sessions'
-              statisticValue={totalSinglePageSessions}
-            />
-          </div>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint="api/v1/pages/time-on-pages/average"
+            statisticFormat="elapsedTime"
+            statisticKey="timeOnPageAverage"
+            statisticName="Visit Duration"
+          />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <div>
-            <DisplayStatisticNumber
-              format='percent'
-              statisticName='Bounce Rate'
-              statisticValue={bounceRate}
-            />
-          </div>
-        </Grid>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint="api/v1/sessions/bounce-rate"
+            statisticFormat="percent"
+            statisticKey="bounceRate"
+            statisticName="Bounce Rate"
+          />
+        </Grid> 
       </Grid>
     </>
   )
