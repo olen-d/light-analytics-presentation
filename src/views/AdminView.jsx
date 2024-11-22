@@ -15,6 +15,22 @@ const AdminView = () => {
   const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
   const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
+  const formatDateJs = date => {
+    const dayJs = date.getDate()
+    const monthJs = date.getMonth() + 1
+    const day = dayJs.toString().padStart(2, '0')
+    const month = monthJs.toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${year}-${month}-${day}`
+  }
+
+  // Set up dates for the statistics Widgets
+  const widgetStatsEndDateJs = new Date()
+  const widgetStatsStartDateJs = new Date()
+  widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 6)
+  const widgetStatsEndDateInitial = formatDateJs(widgetStatsEndDateJs)
+  const widgetStatsStartDateInitial = formatDateJs(widgetStatsStartDateJs)
+
   const [startDateEntryViews, setStartDateEntryViews] = useState(null)
   const [endDateEntryViews, setEndDateEntryViews] = useState(null)
   const [startDateExitViews, setStartDateExitViews] = useState(null)
@@ -44,7 +60,8 @@ const AdminView = () => {
   const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
   const [totalVisitsByMonthFormatted, setTotalVisitsByMonthFormatted] = useState([])
 // End Monthly
-
+  const [widgetStatsEndDate, setWidgetStatsEndDate] = useState(widgetStatsEndDateInitial)
+  const [widgetStatsStartDate, setWidgetStatsStartDate] = useState(widgetStatsStartDateInitial)
   // Utility Functions
   const exceededFormatted = values => {
     const categories = values.slice(0,4)
@@ -58,15 +75,6 @@ const AdminView = () => {
 
   const exceededTruncated = (values, limit) => {
     return values.slice(0, limit)
-  }
-
-  const formatDateJs = date => {
-    const dayJs = date.getDate()
-    const monthJs = date.getMonth() + 1
-    const day = dayJs.toString().padStart(2, '0')
-    const month = monthJs.toString().padStart(2, '0')
-    const year = date.getFullYear()
-    return `${year}-${month}-${day}`
   }
 
   const formatDateHuman = (date, options) => {
@@ -713,7 +721,7 @@ useEffect(() => {
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-            endpoint="api/v1/sessions"
+            endpoint={`api/v1/sessions?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             statisticKey="totalVisits"
             statisticName="Total Visits"
           />
@@ -722,7 +730,7 @@ useEffect(() => {
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-            endpoint="api/v1/sessions/unique"
+            endpoint={`api/v1/sessions/unique?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
           />
@@ -731,7 +739,7 @@ useEffect(() => {
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-            endpoint="api/v1/pages/time-on-pages/average"
+            endpoint={`api/v1/pages/time-on-pages/average?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             statisticFormat="elapsedTime"
             statisticKey="timeOnPageAverage"
             statisticName="Visit Duration"
@@ -741,12 +749,12 @@ useEffect(() => {
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-            endpoint="api/v1/sessions/bounce-rate"
+            endpoint={`api/v1/sessions/bounce-rate?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             statisticFormat="percent"
             statisticKey="bounceRate"
             statisticName="Bounce Rate"
           />
-        </Grid> 
+        </Grid>
       </Grid>
     </>
   )
