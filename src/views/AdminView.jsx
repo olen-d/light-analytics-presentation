@@ -755,6 +755,35 @@ useEffect(() => {
             statisticName="Bounce Rate"
           />
         </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint={`api/v1/pages?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticKey="totalViews"
+            statisticName="Total Views"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint={`api/v1/pages/views/per-visit?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            round={1}
+            statisticKey="viewsPerVisit"
+            statisticName="Views Per Visit"
+          />
+        </Grid>
+        <Grid xs={6} md={4} lg={3} xl={2}>
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            endpoint={`api/v1/pages/time/per-view?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticFormat="elapsedTime"
+            statisticKey="timePerPageview"
+            statisticName="Time Per Pageview"
+          />
+        </Grid>
       </Grid>
     </>
   )
