@@ -105,6 +105,15 @@
   stroke-width: 4;
 }
 
+.display-statistic-change {
+  width: fit-content;
+  border-radius: 5px;
+  margin-bottom: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 .display-statistic-number {
   background-color: #f8f8f8;
   padding: 1rem;
