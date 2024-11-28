@@ -742,6 +742,7 @@ useEffect(() => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/pages/time-on-pages/average?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticChangeKey={"timeOnPageAverageChange"}
             statisticFormat="elapsedTime"
             statisticKey="timeOnPageAverage"
             statisticName="Visit Duration"

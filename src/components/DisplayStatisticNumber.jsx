@@ -27,7 +27,7 @@ const DisplayStatisticNumber = ({
         return statisticValue
     }
   }
-console.log(`STAT: ${statisticChange}`)
+
   const rounded = () => {
     const expanded = 10 ** round * converted()
     const rounded = Math.round(expanded)
