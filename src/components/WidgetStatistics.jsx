@@ -6,6 +6,7 @@ const WidgetStatistics = ({
   apiKeyRead,
   baseAnalyticsApiUrl,
   endpoint,
+  statisticChangeKey,
   statisticFormat = 'none',
   statisticKey,
   statisticName
@@ -24,6 +25,7 @@ const WidgetStatistics = ({
   } else {
     if (fetchResult.status === 'ok') {
       const statisticValue = fetchResult.data[statisticKey]
+      const statisticChange = fetchResult.data[statisticChangeKey]
       const { data: { startDate, endDate }, } = fetchResult
 
       const offset = new Date().getTimezoneOffset()
@@ -47,6 +49,7 @@ const WidgetStatistics = ({
           startDate={startDateProcessed}
           statisticName={statisticName}
           statisticValue={statisticValue}
+          statisticChange={statisticChange}
         />
       )
     }

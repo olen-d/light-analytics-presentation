@@ -1,12 +1,13 @@
-'use strict'
-
 import { PropTypes } from 'prop-types'
+
+import DisplayStatisticChange from './DisplayStatisticChange'
 
 const DisplayStatisticNumber = ({
   endDate,
   format = 'none',
   round = 0,
   startDate,
+  statisticChange,
   statisticName = 'Name',
   statisticValue = 0
 }) => {
@@ -80,6 +81,7 @@ const DisplayStatisticNumber = ({
         <div className='display-statistic-number-value'>
           {formatted()}
         </div>
+        <DisplayStatisticChange statisticChangeValue={statisticChange} />
         <div className='display-statistic-number-date-range'>
           {startDate && formattedStartDate()} { startDate && endDate && rangeSeparator } {endDate && formattedEndDate()}
         </div>
