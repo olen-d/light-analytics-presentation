@@ -732,6 +732,7 @@ useEffect(() => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/sessions/unique?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticChangeKey="uniqueVisitsChange"
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
           />
