@@ -5,6 +5,7 @@ import DisplayStatisticChange from './DisplayStatisticChange'
 const DisplayStatisticNumber = ({
   endDate,
   format = 'none',
+  reverseChangeColors,
   round = 0,
   startDate,
   statisticChange,
@@ -81,7 +82,7 @@ const DisplayStatisticNumber = ({
         <div className='display-statistic-number-value'>
           {formatted()}
         </div>
-        <DisplayStatisticChange statisticChangeValue={statisticChange} />
+        <DisplayStatisticChange reverseChangeColors={reverseChangeColors} statisticChangeValue={statisticChange} />
         <div className='display-statistic-number-date-range'>
           {startDate && formattedStartDate()} { startDate && endDate && rangeSeparator } {endDate && formattedEndDate()}
         </div>
@@ -90,10 +91,11 @@ const DisplayStatisticNumber = ({
   )
 }
 
-const { number, string } = PropTypes
+const { bool, number, string } = PropTypes
 
 DisplayStatisticNumber.propTypes = {
   format: string,
+  reverseChangeColors: bool,
   round: number,
   statisticName: string,
   statisticValue: number
