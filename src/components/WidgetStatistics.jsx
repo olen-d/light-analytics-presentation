@@ -1,3 +1,5 @@
+import { PropTypes } from 'prop-types'
+
 import useFetchData from '../hooks/useFetchData'
 
 import DisplayStatisticNumber from './DisplayStatisticNumber'
@@ -6,6 +8,7 @@ const WidgetStatistics = ({
   apiKeyRead,
   baseAnalyticsApiUrl,
   endpoint,
+  reverseChangeColors,
   statisticChangeKey,
   statisticFormat = 'none',
   statisticKey,
@@ -46,6 +49,7 @@ const WidgetStatistics = ({
         <DisplayStatisticNumber
           endDate={endDateProcessed}
           format={statisticFormat}
+          reverseChangeColors={reverseChangeColors}
           startDate={startDateProcessed}
           statisticName={statisticName}
           statisticValue={statisticValue}
@@ -54,6 +58,19 @@ const WidgetStatistics = ({
       )
     }
   }
+}
+
+const { bool, number, string } = PropTypes
+
+WidgetStatistics.propTypes = {
+  apiKeyRead: string,
+  baseAnalyticsApiUrl: string,
+  endpoint: string,
+  reverseChangeColors: bool,
+  statisticChangeKey: string,
+  statisticFormat: string,
+  statisticKey: string,
+  statisticName: string
 }
 
 export default WidgetStatistics

@@ -1,5 +1,3 @@
-'use strict'
-
 import { useEffect, useState } from 'react'
 
 import ChartBar from '../components/ChartBar'
@@ -753,6 +751,8 @@ useEffect(() => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/sessions/bounce-rate?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            reverseChangeColors={true}
+            statisticChangeKey={"bounceRateChange"}
             statisticFormat="percent"
             statisticKey="bounceRate"
             statisticName="Bounce Rate"
