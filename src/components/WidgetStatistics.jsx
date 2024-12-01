@@ -9,6 +9,7 @@ const WidgetStatistics = ({
   baseAnalyticsApiUrl,
   endpoint,
   reverseChangeColors,
+  round,
   statisticChangeKey,
   statisticFormat = 'none',
   statisticKey,
@@ -50,6 +51,7 @@ const WidgetStatistics = ({
           endDate={endDateProcessed}
           format={statisticFormat}
           reverseChangeColors={reverseChangeColors}
+          round={round}
           startDate={startDateProcessed}
           statisticName={statisticName}
           statisticValue={statisticValue}
@@ -67,6 +69,7 @@ WidgetStatistics.propTypes = {
   baseAnalyticsApiUrl: string,
   endpoint: string,
   reverseChangeColors: bool,
+  round: number,
   statisticChangeKey: string,
   statisticFormat: string,
   statisticKey: string,
