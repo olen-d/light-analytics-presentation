@@ -763,6 +763,7 @@ useEffect(() => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/pages?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticChangeKey="totalViewsChange"
             statisticKey="totalViews"
             statisticName="Total Views"
           />
@@ -773,6 +774,7 @@ useEffect(() => {
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/pages/views/per-visit?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             round={1}
+            statisticChangeKey="viewsPerVisitChange"
             statisticKey="viewsPerVisit"
             statisticName="Views Per Visit"
           />
@@ -782,6 +784,7 @@ useEffect(() => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint={`api/v1/pages/time/per-view?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            statisticChangeKey="timePerPageviewChange"
             statisticFormat="elapsedTime"
             statisticKey="timePerPageview"
             statisticName="Time Per Pageview"
