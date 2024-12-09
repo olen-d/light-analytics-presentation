@@ -3,8 +3,8 @@ import { useEffect, useState } from 'react'
 import useFetchData from '../hooks/useFetchData'
 
 import ChartLine from '../components/ChartLine'
-import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
+import SelectGeneric from '../components/form-fields/SelectGeneric'
 import SubtitleChart from '../components/SubtitleChart'
 import TableBasic from '../components/TableBasic'
 import WidgetStatistics from '../components/WidgetStatistics'
@@ -16,6 +16,17 @@ const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
 const VisitorsView = () => {
   const [chartSize, setChartSize] = useState(null)
+  const [visitStatsPeriod, setVisitStatsPeriod] = useState('forever')
+  const [widgetQueryString, setWidgetQueryString] = useState('')
+
+  const formatDateJs = date => {
+    const dayJs = date.getDate()
+    const monthJs = date.getMonth() + 1
+    const day = dayJs.toString().padStart(2, '0')
+    const month = monthJs.toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${year}-${month}-${day}`
+  }
 
   const MonthlyVisits = () => {
 
@@ -181,7 +192,72 @@ const VisitorsView = () => {
     }
   }
 
+  const handleChangeOptionsStatisticsVisits = event => {
+    const { target: { value: selectValue }, } = event
 
+    setVisitStatsPeriod(selectValue)
+
+    const widgetStatsEndDateJs = new Date()
+    const widgetStatsStartDateJs = new Date()
+    
+    const widgetStatsEndDate = formatDateJs(widgetStatsEndDateJs)
+
+    let widgetStatsStartDate = null
+
+    switch (selectValue) {
+      case 'last7d':
+        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 6)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last30d':
+        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 29)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last6m':
+        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 6)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last12m':
+        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 12)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'forever':
+      default:
+        setWidgetQueryString('')
+    }
+  }
+
+  const optionsStatisticsVisits = [
+    {
+      label: 'Last 7 Days',
+      value: 'last7d',
+      description: ''
+    },
+    {
+      label: 'Last 30 Days',
+      value: 'last30d',
+      description: ''
+    },
+    {
+      label: 'Last 6 Months',
+      value: 'last6m',
+      description: ''
+    },
+    {
+      label: 'Last 12 Months',
+      value: 'last12m',
+      description: ''
+    },
+    {
+      label: 'All Time',
+      value: 'forever',
+      description: ''
+    }
+  ]
 
   useEffect(() => {
     const screen = {
@@ -220,11 +296,30 @@ const VisitorsView = () => {
       </Grid>
       {/* <MonthlyVisitsSummary /> */}
       <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={12} sm={6} md={9}>
+          <div className="widget-statistics-title">
+            Visitor Statistics
+          </div>
+        </Grid>
+        <Grid xs={12} sm={6} md={3}>
+          <div className="widget-statistics-select-period">
+            <SelectGeneric
+              handleChange={handleChangeOptionsStatisticsVisits}
+              id='select-generic-statistics-visits-period'
+              initialValue={visitStatsPeriod}
+              labelId='select-generic-statistics-visits-period-label'
+              labeltext="Period"
+              options={optionsStatisticsVisits}
+            />
+          </div>
+        </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions"
+            queryString={widgetQueryString}
+            statisticChangeKey="totalVisitsChange"
             statisticKey="totalVisits"
             statisticName="Total Visits"
           />
@@ -234,6 +329,8 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/unique"
+            queryString={widgetQueryString}
+            statisticChangeKey="uniqueVisitsChange"
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
           />
@@ -243,6 +340,8 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages/time-on-pages/average"
+            queryString={widgetQueryString}
+            statisticChangeKey={"timeOnPageAverageChange"}
             statisticFormat="elapsedTime"
             statisticKey="timeOnPageAverage"
             statisticName="Visit Duration"
@@ -253,6 +352,8 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/bounce-rate"
+            queryString={widgetQueryString}
+            statisticChangeKey={"bounceRateChange"}
             statisticFormat="percent"
             statisticKey="bounceRate"
             statisticName="Bounce Rate"

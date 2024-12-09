@@ -8,6 +8,7 @@ const WidgetStatistics = ({
   apiKeyRead,
   baseAnalyticsApiUrl,
   endpoint,
+  queryString = '',
   reverseChangeColors,
   round,
   statisticChangeKey,
@@ -15,7 +16,7 @@ const WidgetStatistics = ({
   statisticKey,
   statisticName
 }) => {
-  const url = `${baseAnalyticsApiUrl}/${endpoint}`
+  const url = `${baseAnalyticsApiUrl}/${endpoint}${queryString}`
 
   const requestConfig = {
     apiKey: apiKeyRead,
