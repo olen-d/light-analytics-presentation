@@ -168,3 +168,20 @@
 .top-table {
   padding-top: 3rem;
 }
+
+.widget-statistics-title {
+  font-size: 1.5rem;
+  color: #333;
+  text-align: left;
+  margin-top: 1rem;
+  margin-bottom: 0.1rem;
+}
+
+@media (max-width: 600px) {
+  .widget-statistics-select-period {
+    padding-bottom: 1.5rem;
+  }
+  .widget-statistics-title {
+    padding-bottom: 1.5rem;
+  }
+}
