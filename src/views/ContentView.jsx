@@ -5,8 +5,10 @@ import useFetchData from '../hooks/useFetchData'
 import ChartLine from '../components/ChartLine'
 import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
+import SelectGeneric from '../components/form-fields/SelectGeneric'
 import SubtitleChart from '../components/SubtitleChart'
 import TableSort from '../components/TableSort'
+import WidgetStatistics from '../components/WidgetStatistics'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
 
@@ -15,6 +17,17 @@ const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
 const ContentView = () => {
   const [chartSize, setChartSize] = useState(null)
+  const [viewStatsPeriod, setViewStatsPeriod] = useState('forever')
+  const [widgetQueryString, setWidgetQueryString] = useState('')
+
+  const formatDateJs = date => {
+    const dayJs = date.getDate()
+    const monthJs = date.getMonth() + 1
+    const day = dayJs.toString().padStart(2, '0')
+    const month = monthJs.toString().padStart(2, '0')
+    const year = date.getFullYear()
+    return `${year}-${month}-${day}`
+  }
 
   const MonthlyViews = () => {
 
@@ -139,42 +152,72 @@ const ContentView = () => {
     }
   }
 
-  const WidgetStatistics = ({
-    endpoint,
-    round = 0,
-    statisticFormat = 'none',
-    statisticKey,
-    statisticName
-  }) => {
-    const url = `${baseAnalyticsApiUrl}/${endpoint}`
+  const handleChangeOptionsStatisticsViews = event => {
+    const { target: { value: selectValue }, } = event
 
-    const requestConfig = {
-      apiKey: apiKeyRead,
-      method: 'GET',
-      url
-    }
+    setViewStatsPeriod(selectValue)
 
-    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
-    if (isLoading) {
-      return 'Loading...'
-    } else {
-      if (fetchResult.status === 'ok') {
-        const statisticValue = fetchResult.data[statisticKey]
-        const { data: { startDate, endDate }, } = fetchResult
+    const widgetStatsEndDateJs = new Date()
+    const widgetStatsStartDateJs = new Date()
+    
+    const widgetStatsEndDate = formatDateJs(widgetStatsEndDateJs)
 
-        return(
-          <DisplayStatisticNumber
-            endDate={endDate}
-            format={statisticFormat}
-            round={round}
-            startDate={startDate}
-            statisticName={statisticName}
-            statisticValue={statisticValue}
-          />
-        )
-      }
+    let widgetStatsStartDate = null
+
+    switch (selectValue) {
+      case 'last7d':
+        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 6)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last30d':
+        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 29)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last6m':
+        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 6)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'last12m':
+        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 12)
+        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
+        break
+      case 'forever':
+      default:
+        setWidgetQueryString('')
     }
   }
+
+  const optionsStatisticsViews = [
+    {
+      label: 'Last 7 Days',
+      value: 'last7d',
+      description: ''
+    },
+    {
+      label: 'Last 30 Days',
+      value: 'last30d',
+      description: ''
+    },
+    {
+      label: 'Last 6 Months',
+      value: 'last6m',
+      description: ''
+    },
+    {
+      label: 'Last 12 Months',
+      value: 'last12m',
+      description: ''
+    },
+    {
+      label: 'All Time',
+      value: 'forever',
+      description: ''
+    }
+  ]
 
   useEffect(() => {
     const screen = {
@@ -212,24 +255,53 @@ const ContentView = () => {
         </Grid>
       </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+      <Grid xs={12} sm={6} md={9}>
+          <div className="widget-statistics-title">
+            Content Statistics
+          </div>
+        </Grid>
+        <Grid xs={12} sm={6} md={3}>
+          <div className="widget-statistics-select-period">
+            <SelectGeneric
+              handleChange={handleChangeOptionsStatisticsViews}
+              id='select-generic-statistics-visits-period'
+              initialValue={viewStatsPeriod}
+              labelId='select-generic-statistics-visits-period-label'
+              labeltext="Period"
+              options={optionsStatisticsViews}
+            />
+          </div>
+        </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages"
+            queryString={widgetQueryString}
+            statisticChangeKey="totalViewsChange"
             statisticKey="totalViews"
             statisticName="Total Views"
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages/views/per-visit"
+            queryString={widgetQueryString}
             round={1}
+            statisticChangeKey="viewsPerVisitChange"
             statisticKey="viewsPerVisit"
             statisticName="Views Per Visit"
           />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
-          <WidgetStatistics 
+          <WidgetStatistics
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages/time/per-view"
+            queryString={widgetQueryString}
+            statisticChangeKey="timePerPageviewChange"
             statisticFormat="elapsedTime"
             statisticKey="timePerPageview"
             statisticName="Time Per Pageview"
