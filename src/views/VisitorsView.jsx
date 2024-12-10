@@ -352,6 +352,7 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/bounce-rate"
+            reverseChangeColors={true}
             queryString={widgetQueryString}
             statisticChangeKey={"bounceRateChange"}
             statisticFormat="percent"
