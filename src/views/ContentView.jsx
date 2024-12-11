@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import useFetchData from '../hooks/useFetchData'
 
 import ChartLine from '../components/ChartLine'
-import DisplayStatisticNumber from '../components/DisplayStatisticNumber'
 import LayoutChart from '../components/LayoutChart'
 import SelectGeneric from '../components/form-fields/SelectGeneric'
 import SubtitleChart from '../components/SubtitleChart'
@@ -20,13 +19,23 @@ const ContentView = () => {
   const [viewStatsPeriod, setViewStatsPeriod] = useState('forever')
   const [widgetQueryString, setWidgetQueryString] = useState('')
 
-  const formatDateJs = date => {
+  const formatDateQueryString = date => {
     const dayJs = date.getDate()
     const monthJs = date.getMonth() + 1
     const day = dayJs.toString().padStart(2, '0')
     const month = monthJs.toString().padStart(2, '0')
     const year = date.getFullYear()
     return `${year}-${month}-${day}`
+  }
+
+  const formatDateTimeQueryString = dateTime => {
+    const dateString = formatDateQueryString(dateTime)
+
+    const hoursJs = dateTime.getHours()
+    const minutesJs = dateTime.getMinutes()
+    const secondsJs = dateTime.getSeconds()
+
+    return `${dateString}T${hoursJs}:${minutesJs}:${secondsJs}`
   }
 
   const MonthlyViews = () => {
@@ -160,29 +169,36 @@ const ContentView = () => {
     const widgetStatsEndDateJs = new Date()
     const widgetStatsStartDateJs = new Date()
     
-    const widgetStatsEndDate = formatDateJs(widgetStatsEndDateJs)
+    const widgetStatsEndDate = formatDateQueryString(widgetStatsEndDateJs)
+    const widgetStatsEndDateTime = formatDateTimeQueryString(widgetStatsEndDateJs)
 
     let widgetStatsStartDate = null
+    let widgetStatsStartDateTime = null
 
     switch (selectValue) {
+      case 'last24h':
+        widgetStatsStartDateJs.setHours(widgetStatsStartDateJs.getHours() - 24)
+        widgetStatsStartDateTime = formatDateTimeQueryString(widgetStatsStartDateJs)
+        setWidgetQueryString(`?startdate=${widgetStatsStartDateTime}&enddate=${widgetStatsEndDateTime}`)
+        break
       case 'last7d':
         widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 6)
-        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
         setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
         break
       case 'last30d':
         widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 29)
-        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
         setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
         break
       case 'last6m':
         widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 6)
-        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
         setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
         break
       case 'last12m':
         widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 12)
-        widgetStatsStartDate = formatDateJs(widgetStatsStartDateJs)
+        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
         setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
         break
       case 'forever':
@@ -192,6 +208,11 @@ const ContentView = () => {
   }
 
   const optionsStatisticsViews = [
+    {
+      label: 'Last 24 Hours',
+      value: 'last24h',
+      description: ''
+    },
     {
       label: 'Last 7 Days',
       value: 'last7d',
