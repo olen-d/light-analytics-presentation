@@ -4,7 +4,7 @@ import useFetchData from '../hooks/useFetchData'
 
 import ChartLine from '../components/ChartLine'
 import LayoutChart from '../components/LayoutChart'
-import SelectGeneric from '../components/form-fields/SelectGeneric'
+import SelectPeriod from '../components/SelectPeriod'
 import SubtitleChart from '../components/SubtitleChart'
 import TableSort from '../components/TableSort'
 import WidgetStatistics from '../components/WidgetStatistics'
@@ -16,27 +16,7 @@ const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
 const ContentView = () => {
   const [chartSize, setChartSize] = useState(null)
-  const [viewStatsPeriod, setViewStatsPeriod] = useState('forever')
   const [widgetQueryString, setWidgetQueryString] = useState('')
-
-  const formatDateQueryString = date => {
-    const dayJs = date.getDate()
-    const monthJs = date.getMonth() + 1
-    const day = dayJs.toString().padStart(2, '0')
-    const month = monthJs.toString().padStart(2, '0')
-    const year = date.getFullYear()
-    return `${year}-${month}-${day}`
-  }
-
-  const formatDateTimeQueryString = dateTime => {
-    const dateString = formatDateQueryString(dateTime)
-
-    const hoursJs = dateTime.getHours()
-    const minutesJs = dateTime.getMinutes()
-    const secondsJs = dateTime.getSeconds()
-
-    return `${dateString}T${hoursJs}:${minutesJs}:${secondsJs}`
-  }
 
   const MonthlyViews = () => {
 
@@ -161,84 +141,9 @@ const ContentView = () => {
     }
   }
 
-  const handleChangeOptionsStatisticsViews = event => {
-    const { target: { value: selectValue }, } = event
-
-    setViewStatsPeriod(selectValue)
-
-    const widgetStatsEndDateJs = new Date()
-    const widgetStatsStartDateJs = new Date()
-    
-    const widgetStatsEndDate = formatDateQueryString(widgetStatsEndDateJs)
-    const widgetStatsEndDateTime = formatDateTimeQueryString(widgetStatsEndDateJs)
-
-    let widgetStatsStartDate = null
-    let widgetStatsStartDateTime = null
-
-    switch (selectValue) {
-      case 'last24h':
-        widgetStatsStartDateJs.setHours(widgetStatsStartDateJs.getHours() - 24)
-        widgetStatsStartDateTime = formatDateTimeQueryString(widgetStatsStartDateJs)
-        setWidgetQueryString(`?startdate=${widgetStatsStartDateTime}&enddate=${widgetStatsEndDateTime}`)
-        break
-      case 'last7d':
-        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 6)
-        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
-        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
-        break
-      case 'last30d':
-        widgetStatsStartDateJs.setDate(widgetStatsStartDateJs.getDate() - 29)
-        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
-        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
-        break
-      case 'last6m':
-        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 6)
-        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
-        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
-        break
-      case 'last12m':
-        widgetStatsStartDateJs.setMonth(widgetStatsStartDateJs.getMonth() - 12)
-        widgetStatsStartDate = formatDateQueryString(widgetStatsStartDateJs)
-        setWidgetQueryString(`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`)
-        break
-      case 'forever':
-      default:
-        setWidgetQueryString('')
-    }
+  const handleWidgetQueryString = data => {
+    setWidgetQueryString(data)
   }
-
-  const optionsStatisticsViews = [
-    {
-      label: 'Last 24 Hours',
-      value: 'last24h',
-      description: ''
-    },
-    {
-      label: 'Last 7 Days',
-      value: 'last7d',
-      description: ''
-    },
-    {
-      label: 'Last 30 Days',
-      value: 'last30d',
-      description: ''
-    },
-    {
-      label: 'Last 6 Months',
-      value: 'last6m',
-      description: ''
-    },
-    {
-      label: 'Last 12 Months',
-      value: 'last12m',
-      description: ''
-    },
-    {
-      label: 'All Time',
-      value: 'forever',
-      description: ''
-    }
-  ]
 
   useEffect(() => {
     const screen = {
@@ -282,16 +187,12 @@ const ContentView = () => {
           </div>
         </Grid>
         <Grid xs={12} sm={6} md={3}>
-          <div className="widget-statistics-select-period">
-            <SelectGeneric
-              handleChange={handleChangeOptionsStatisticsViews}
-              id='select-generic-statistics-visits-period'
-              initialValue={viewStatsPeriod}
-              labelId='select-generic-statistics-visits-period-label'
-              labeltext="Period"
-              options={optionsStatisticsViews}
-            />
-          </div>
+          <SelectPeriod
+            id="content-statistics-period"
+            initialPeriod="forever"
+            labeltext="period"
+            onQueryString={handleWidgetQueryString}
+          />
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
           <WidgetStatistics
