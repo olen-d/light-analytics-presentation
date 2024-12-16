@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react'
 
 import ChartBar from '../components/ChartBar'
-import ChartColumn from '../components/ChartColumn'
-import ChartLine from '../components/ChartLine'
 import ChartPie from '../components/ChartPie'
 import LayoutChart from '../components/LayoutChart'
+import LayoutTimeSeries from '../components/LayoutTimeSeries'
 import WidgetStatistics from '../components/WidgetStatistics'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
@@ -35,8 +34,6 @@ const AdminView = () => {
   const [endDateExitViews, setEndDateExitViews] = useState(null)
   const [startDateViews, setStartDateViews] = useState(null)
   const [endDateViews, setEndDateViews] = useState(null)
-  const [startDateVisits, setStartDateVisits] = useState(null)
-  const [endDateVisits, setEndDateVisits] = useState(null)
   const [totalEntriesByRoute, setTotalEntriesByRoute] = useState([])
   const [totalExitsByRoute, setTotalExitsByRoute] = useState([])
   const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
@@ -44,16 +41,9 @@ const AdminView = () => {
   const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
   const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
   const [totalTimeByConsolidatedRouteFormatted, setTotalTimeByConsolidatedRouteFormatted] = useState([])
-  const [totalTimeByDayFormatted, setTotalTimeByDayFormatted] = useState([])
-  const [totalTimeByRouteFormatted, setTotalTimeByRouteFormatted] = useState([])
   const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
-  const [totalTimeViewsByRouteFiltered, setTotalTimeViewsByRouteFiltered] = useState([])
   const [totalViewsByConsolidatedRouteFormatted, setTotalViewsByConsolidatedRouteFormatted] = useState([])
-  const [totalViewsByDay, setTotalViewsByDay] = useState([])
-  const [totalViewsByDayFormatted, setTotalViewsByDayFormatted] = useState([])
-  const [totalViewsByRouteFormatted, setTotalViewsByRouteFormatted] = useState([])
-  const [totalVisitsByDay, setTotalVisitsByDay] = useState([])
-  const [totalVisitsByDayFormatted, setTotalVisitsByDayFormatted] = useState([])
+
 // Monthly 
   const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
   const [totalVisitsByMonthFormatted, setTotalVisitsByMonthFormatted] = useState([])
@@ -181,146 +171,6 @@ const AdminView = () => {
     }
     fetchData()
     }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/by-day?startdate=${startDate}&enddate=${endDate}`, requestOptions)
-        const result = await response.json()
-        
-        if(result.status === 'ok') {
-          const dateOptions = {
-            month: 'long',
-            day: 'numeric'
-          }
-
-          setStartDateVisits(formatDateHuman(startDateJs, dateOptions))
-          setEndDateVisits(formatDateHuman(endDateJs, dateOptions))
-
-          const { data: { totalVisitsByDay: tvbd }, } = result
-          setTotalVisitsByDay(tvbd)
-
-          const datesInPeriod = []
-
-          for(let i=0; i < 7; i++) {
-            const lastJs = new Date(startDateJs)
-            lastJs.setDate(lastJs.getDate() + i)
-            const last = formatDateJs(lastJs)
-            datesInPeriod.push(last)
-          }
-
-          const totalVisitsWithZeros = datesInPeriod.map(item => {
-            const index = tvbd.findIndex(d => d.day === item)
-            return index === -1 ? { day: item, count: 0} : tvbd[index]
-          })
-
-          const formattedDates = totalVisitsWithZeros.map(item => {
-            const { day, count } = item
-            const dayParts = day.split('-')
-            const jsDate = new Date(dayParts[0], dayParts[1] -1, dayParts[2])
-
-            const options = { weekday: 'short' }
-            const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
-            const dateFormatted = dateTimeFormat.format(jsDate)
-            return { day: dateFormatted, count }
-          })
-          setTotalVisitsByDayFormatted(formattedDates)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/by-day?startdate=${startDate}&enddate=${endDate}`, requestOptions)
-        const result = await response.json()
-        
-        if(result.status === 'ok') {
-          const { data: { totalViewsByDay: tvbd }, } = result
-          setTotalViewsByDay(tvbd)
-
-          const datesInPeriod = []
-
-          for(let i=0; i < 7; i++) {
-            const lastJs = new Date(startDateJs)
-            lastJs.setDate(lastJs.getDate() + i)
-            const last = formatDateJs(lastJs)
-            datesInPeriod.push(last)
-          }
-
-          const totalVisitsWithZeros = datesInPeriod.map(item => {
-            const index = tvbd.findIndex(d => d.day === item)
-            return index === -1 ? { day: item, count: 0} : tvbd[index]
-          })
-
-          const formattedDates = totalVisitsWithZeros.map(item => {
-            const { day, count } = item
-            const dayParts = day.split('-')
-            const jsDate = new Date(dayParts[0], dayParts[1] -1, dayParts[2])
-
-            const options = { weekday: 'short' }
-            const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
-            const dateFormatted = dateTimeFormat.format(jsDate)
-            return { day: dateFormatted, count }
-          })
-
-          setTotalViewsByDayFormatted(formattedDates)
-
-          const totalTimeByDayFinal = totalVisitsWithZeros.map(item => {
-            const { day, total_time } = item
-            const dayParts = day.split('-')
-            const jsDate = new Date(dayParts[0], dayParts[1] -1, dayParts[2])
-
-            const options = { weekday: 'short' }
-            const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
-            const dateFormatted = dateTimeFormat.format(jsDate)
-
-            const minutes = total_time === undefined ? Number(0) : total_time / 1000 / 60
-            return { day: dateFormatted, count: minutes }
-          })
-
-          setTotalTimeByDayFormatted(totalTimeByDayFinal)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -584,72 +434,54 @@ useEffect(() => {
     />
   )
 
-  const ChartColumnVisits = () => (
-    <ChartColumn
-      categoryName='Days'
-      categoryKey='day'
-      chartData={totalVisitsByDayFormatted}
-      seriesName='Visits'
-      startFromValue={0}
-    />
-  )
-
-  const ChartColumnViews = () => (
-    <ChartColumn
-      categoryName='Days'
-      categoryKey='day'
-      chartData={totalViewsByDayFormatted}
-      seriesName='Page Views'
-      startFromValue={0}
-    />
-  )
-
-  const ChartColumnTime = () => (
-    <ChartColumn
-      categoryName='Days'
-      categoryKey='day'
-      chartData={totalTimeByDayFormatted}
-      seriesName='Minutes'
-      startFromValue={0}
-    />
-  )
-
-  const ChartLineMonthlyVisits = () => (
-    <ChartLine
-      categoryName='Months'
-      categoryKey='month'
-      chartData={totalVisitsByMonthFormatted}
-      seriesName='Visits'
-      startFromValue={0}
-    />
-  )
-
   return(
     <>
       <h1 className="admin-lead extended">Administration</h1>
       <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartColumnVisits}
-            subtitle={`${startDateVisits} to ${endDateVisits}`}
+          <LayoutTimeSeries
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateLabelFormatOptions={{ weekday: 'short' }}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/sessions/by-day"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
+            statisticKey="totalVisitsByDay"
+            statisticTimeKey="day"
+            statisticValueKey="count"
             title="Visits by Weekday"
           />
         </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartColumnViews}
-            subtitle={`${startDateVisits} to ${endDateVisits}`}
+        <LayoutTimeSeries
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateLabelFormatOptions={{ weekday: 'short' }}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/by-day"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
+            statisticKey="totalViewsByDay"
+            statisticTimeKey="day"
+            statisticValueKey="count"
             title="Page Views by Weekday"
           />
         </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartColumnTime}
-            subtitle={`${startDateVisits} to ${endDateVisits}`}
+        <LayoutTimeSeries
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateLabelFormatOptions={{ weekday: 'short' }}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/by-day"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
+            statisticKey="totalViewsByDay"
+            statisticTimeKey="day"
+            statisticValueKey="total_time"
             title="Viewing Time by Weekday"
+            valueFormatOptions="microsecondsToMinutes"
           />
         </Grid>
       </Grid>
@@ -706,11 +538,17 @@ useEffect(() => {
           />
         </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartLineMonthlyVisits}
-            subtitle="Testing"
+          <LayoutTimeSeries
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateLabelFormatOptions={{ weekday: 'short' }}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/sessions/by-day"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
-            title="Visits by Month"
+            statisticKey="totalVisitsByDay"
+            statisticTimeKey="day"
+            statisticValueKey="count"
           />
         </Grid>
       </Grid>
