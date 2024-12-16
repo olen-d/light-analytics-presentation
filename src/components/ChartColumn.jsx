@@ -11,7 +11,8 @@ const ChartColumn = (
     categoryKey,
     chartData,
     seriesName,
-    startFromValue
+    startFromValue,
+    valueKey = 'count'
   }
 ) => {
   const x0 = 60
@@ -24,8 +25,8 @@ const ChartColumn = (
 
   const xAxisY = y0 +  yAxisLength
 
-  const dataYMax = chartData.length > 0 ? chartData.reduce((a, b) => a.count > b.count ? a : b).count : 0
-  const dataYMin = chartData.length > 0 ? chartData.reduce((a, b) => a.count < b.count ? a : b).count : 0
+  const dataYMax = chartData.length > 0 ? chartData.reduce((a, b) => a[valueKey] > b[valueKey] ? a : b)[valueKey] : 0
+  const dataYMin = chartData.length > 0 ? chartData.reduce((a, b) => a[valueKey] < b[valueKey] ? a : b)[valueKey] : 0
 
   const dataYMinAdjusted = isNaN(startFromValue) ? dataYMin : startFromValue
 
@@ -128,7 +129,7 @@ const ChartColumn = (
           {seriesName}
         </text>
 
-        {chartData.map(({ [categoryKey]: category, count: value }, index) => {
+        {chartData.map(({ [categoryKey]: category, [valueKey]: value }, index) => {
           const x = x0 + index * columnPlotWidth
           const yRatio = (value - dataYMinAdjusted ) / dataYRange
           const y = y0 + (1 - yRatio) * yAxisLength
