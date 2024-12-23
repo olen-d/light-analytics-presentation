@@ -12,6 +12,7 @@ const LayoutTimeSeries = ({
   dateLabelFormatOptions,
   dateRangeFormatOptions,
   queryString = '',
+  seriesName,
   source,
   statisticKey,
   statisticTimeKey,
@@ -131,7 +132,7 @@ const LayoutTimeSeries = ({
               categoryName='Days'
               categoryKey='day'
               chartData={seriesWithZerosFormatted}
-              seriesName='Visits'
+              seriesName={seriesName}
               startFromValue={0}
               valueKey={statisticValueKey}
             />

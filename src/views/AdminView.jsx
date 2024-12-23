@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 
 import ChartBar from '../components/ChartBar'
-import ChartPie from '../components/ChartPie'
 import LayoutChart from '../components/LayoutChart'
+import LayoutPartOfWhole from '../components/LayoutPartOfWhole'
 import LayoutTimeSeries from '../components/LayoutTimeSeries'
 import WidgetStatistics from '../components/WidgetStatistics'
 
@@ -32,17 +32,10 @@ const AdminView = () => {
   const [endDateEntryViews, setEndDateEntryViews] = useState(null)
   const [startDateExitViews, setStartDateExitViews] = useState(null)
   const [endDateExitViews, setEndDateExitViews] = useState(null)
-  const [startDateViews, setStartDateViews] = useState(null)
-  const [endDateViews, setEndDateViews] = useState(null)
   const [totalEntriesByRoute, setTotalEntriesByRoute] = useState([])
   const [totalExitsByRoute, setTotalExitsByRoute] = useState([])
   const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
   const [totalExitsByRouteFormatted, setTotalExitsByRouteFormatted] = useState([])
-  const [totalFilteredTimeByRouteFormatted, setTotalFilteredTimeByRouteFormatted] = useState([])
-  const [totalFilteredViewsByRouteFormatted, setTotalFilteredViewsByRouteFormatted] = useState([])
-  const [totalTimeByConsolidatedRouteFormatted, setTotalTimeByConsolidatedRouteFormatted] = useState([])
-  const [totalTimeViewsByRoute, setTotalTimeViewsByRoute] = useState([])
-  const [totalViewsByConsolidatedRouteFormatted, setTotalViewsByConsolidatedRouteFormatted] = useState([])
 
 // Monthly 
   const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
@@ -51,16 +44,6 @@ const AdminView = () => {
   const [widgetStatsEndDate, setWidgetStatsEndDate] = useState(widgetStatsEndDateInitial)
   const [widgetStatsStartDate, setWidgetStatsStartDate] = useState(widgetStatsStartDateInitial)
   // Utility Functions
-  const exceededFormatted = values => {
-    const categories = values.slice(0,4)
-    const others = values.slice(4)
-
-    const otherTotal = others.reduce((sum, { value }) => sum + value, 0)
-    categories.push({ dataLabel: 'Other', value: otherTotal})
-
-    return categories
-  }
-
   const exceededTruncated = (values, limit) => {
     return values.slice(0, limit)
   }
@@ -68,16 +51,6 @@ const AdminView = () => {
   const formatDateHuman = (date, options) => {
     const dateTimeFormatHuman = new Intl.DateTimeFormat('en-US', options).format(date)
     return dateTimeFormatHuman
-  }
-
-  const formatSlug = slug => {
-    return slug
-      .toLowerCase()
-      .split('-')
-      .map(item => {
-        return item[0].toUpperCase() + item.substr(1)
-      })
-      .join(' ')
   }
 
   const truncateString = (string, maxLength) => {
@@ -108,150 +81,6 @@ const AdminView = () => {
       return string
     }
   }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/routes/total-time-views?startdate=${startDate}&enddate=${endDate}&levels=${2}`, requestOptions)
-        const result = await response.json()
-        
-        if(result.status === 'ok') {
-          const dateOptions = {
-            month: 'long',
-            day: 'numeric'
-          }
-          setStartDateViews(formatDateHuman(startDateJs, dateOptions))
-          setEndDateViews(formatDateHuman(endDateJs, dateOptions))
-
-          const { data: ttvbcr } = result
-
-          const sortedTotalViewsByConsolidatedRoute = ttvbcr.toSorted((a, b) => {
-            return b.total_views - a.total_views
-          })
-
-          const sortedTotalTimeByConsolidatedRoute = ttvbcr.toSorted((a, b) => {
-            return b.total_time - a.total_time
-          })
-
-          const totalViewsByConsolidatedRoute = sortedTotalViewsByConsolidatedRoute.map(item => {
-            const { 'route_consolidated': routeConsolidated, 'total_views': value } = item
-            const dataLabel = routeConsolidated
-            return({ dataLabel, value })
-          })
-
-          const totalTimeByConsolidatedRoute = sortedTotalTimeByConsolidatedRoute.map(item => {
-            const { 'route_consolidated': routeConsolidated, 'total_time': value } = item
-            const dataLabel = routeConsolidated
-            return({ dataLabel, value })
-          })
-      
-          const totalViewsByConsolidatedRouteFinal = totalViewsByConsolidatedRoute.length > 5 ? exceededFormatted(totalViewsByConsolidatedRoute) : totalViewsByConsolidatedRoute
-          const totalTimeByConsolidatedRouteFinal = totalTimeByConsolidatedRoute.length > 5 ? exceededFormatted(totalTimeByConsolidatedRoute) : totalTimeByConsolidatedRoute
-
-          setTotalViewsByConsolidatedRouteFormatted(totalViewsByConsolidatedRouteFinal)
-          setTotalTimeByConsolidatedRouteFormatted(totalTimeByConsolidatedRouteFinal)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-    }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/routes/total-time-views?startdate=${startDate}&enddate=${endDate}`, requestOptions)
-        const result = await response.json()
-        
-        if(result.status === 'ok') {
-          const dateOptions = {
-            month: 'long',
-            day: 'numeric'
-          }
-
-          setStartDateViews(formatDateHuman(startDateJs, dateOptions))
-          setEndDateViews(formatDateHuman(endDateJs, dateOptions))
-  
-          const { data: ttvbr } = result
-          setTotalTimeViewsByRoute(ttvbr)
-
-          const sortedTotalViewsByRoute = ttvbr.toSorted((a, b) => {
-            return b.total_views - a.total_views
-          })
-
-          const sortedTotalTimeByRoute = ttvbr.toSorted((a, b) => {
-            return b.total_time - a.total_time
-          })
-
-          const filteredTotalTimeViewsByRoute = ttvbr.filter(item => {
-            const { route } = item
-            return route.includes('/courses/')
-          })
-
-          const sortedFilteredTotalViewsByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
-            return b.total_views - a.total_views
-          })
-
-          const sortedFilteredTotalTimeByRoute = filteredTotalTimeViewsByRoute.toSorted((a, b) => {
-            return b.total_time - a.total_time
-          })
-
-          const totalFilteredViewsByRoute = sortedFilteredTotalViewsByRoute.map(item => {
-            const { route, 'total_views': value } = item
-            const routeSlug = route.split('/').pop()
-            const dataLabel = formatSlug(routeSlug)
-            return({ dataLabel, value })
-          })
-
-          const totalFilteredTimeByRoute = sortedFilteredTotalTimeByRoute.map(item => {
-            const { route, 'total_time': value } = item
-            const routeSlug = route.split('/').pop()
-            const dataLabel = formatSlug(routeSlug)
-            return({ dataLabel, value })
-          })
-      
-          const totalFilteredViewsByRouteFinal = totalFilteredViewsByRoute.length > 5 ? exceededFormatted(totalFilteredViewsByRoute) : totalFilteredViewsByRoute
-          const totalFilteredTimeByRouteFinal = totalFilteredTimeByRoute.length > 5 ? exceededFormatted(totalFilteredTimeByRoute) : totalFilteredTimeByRoute
-
-          setTotalFilteredViewsByRouteFormatted(totalFilteredViewsByRouteFinal)
-          setTotalFilteredTimeByRouteFormatted(totalFilteredTimeByRouteFinal)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-
-    fetchData()
-  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -446,6 +275,7 @@ useEffect(() => {
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/sessions/by-day"
             queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            seriesName="Visits"
             source="No Car Gravel"
             statisticKey="totalVisitsByDay"
             statisticTimeKey="day"
@@ -462,6 +292,7 @@ useEffect(() => {
             endpoint="api/v1/pages/by-day"
             queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
+            seriesName="Views"
             statisticKey="totalViewsByDay"
             statisticTimeKey="day"
             statisticValueKey="count"
@@ -476,6 +307,7 @@ useEffect(() => {
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/pages/by-day"
             queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            seriesName="Minutes"
             source="No Car Gravel"
             statisticKey="totalViewsByDay"
             statisticTimeKey="day"
@@ -487,35 +319,47 @@ useEffect(() => {
       </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-              chart={ChartPie}
-              chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-              chartData={totalViewsByConsolidatedRouteFormatted}
-              startAngle={-90}
-              subtitle={`${startDateViews} to ${endDateViews}`}
-              source="No Car Gravel"
-              title="Routes by Page Views"
-          />  
-        </Grid>
-        <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-              chart={ChartPie}
-              chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-              chartData={totalFilteredViewsByRouteFormatted}
-              startAngle={-90}
-              subtitle={`${startDateViews} to ${endDateViews}`}
-              source="No Car Gravel"
-              title="Courses by Page Views"
-          />  
-        </Grid>
-        <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartPie}
-            chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-            chartData={totalFilteredTimeByRouteFormatted}
-            startAngle={-90}
-            subtitle={`${startDateViews} to ${endDateViews}`}
+          <LayoutPartOfWhole
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateLabelFormatOptions={{ weekday: 'short' }}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/routes/total-views"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}&levels=2`}
             source="No Car Gravel"
+            statisticKey="data"
+            statisticCategoryKey="route_consolidated"
+            statisticValueKey="total_views"
+            title="Routes by Page Views"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutPartOfWhole
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/routes/components/total-views"
+            queryString={`?componentName=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            shouldFormatSlug={true}
+            source="No Car Gravel"
+            statisticKey="data"
+            statisticCategoryKey="component_summary"
+            statisticValueKey="total_views"
+            title="Courses by Page Views"
+          />
+        </Grid>
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutPartOfWhole
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/routes/components/total-time"
+            queryString={`?componentName=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            shouldFormatSlug={true}
+            source="No Car Gravel"
+            statisticKey="data"
+            statisticCategoryKey="component_summary"
+            statisticValueKey="total_time"
             title="Courses by Viewing Time"
           />
         </Grid>
@@ -538,17 +382,18 @@ useEffect(() => {
           />
         </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutTimeSeries
+          <LayoutPartOfWhole
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-            dateLabelFormatOptions={{ weekday: 'short' }}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
-            endpoint="api/v1/sessions/by-day"
-            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            endpoint="api/v1/pages/routes/components/total-time"
+            queryString={`?componentName=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            shouldFormatSlug={true}
             source="No Car Gravel"
-            statisticKey="totalVisitsByDay"
-            statisticTimeKey="day"
-            statisticValueKey="count"
+            statisticKey="data"
+            statisticCategoryKey="component_summary"
+            statisticValueKey="total_time"
+            title="Courses by Viewing Time"
           />
         </Grid>
       </Grid>

@@ -1,5 +1,3 @@
-'use strict'
-
 const SVG_WIDTH = 300
 const SVG_HEIGHT = 200
 const PIE_WIDTH = SVG_WIDTH

@@ -37,8 +37,7 @@ const { array } = PropTypes
 
 LegendChart.propTypes = {
   chartColors: array,
-  dataLabels: array,
-  dataValues: array,
+  chartData: array,
 }
 
 export default LegendChart
