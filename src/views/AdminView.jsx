@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
-import ChartBar from '../components/ChartBar'
-import LayoutChart from '../components/LayoutChart'
 import LayoutPartOfWhole from '../components/LayoutPartOfWhole'
+import LayoutRankedCategories from '../components/LayoutRankedCategories'
 import LayoutTimeSeries from '../components/LayoutTimeSeries'
 import WidgetStatistics from '../components/WidgetStatistics'
 
@@ -28,240 +27,9 @@ const AdminView = () => {
   const widgetStatsEndDateInitial = formatDateJs(widgetStatsEndDateJs)
   const widgetStatsStartDateInitial = formatDateJs(widgetStatsStartDateJs)
 
-  const [startDateEntryViews, setStartDateEntryViews] = useState(null)
-  const [endDateEntryViews, setEndDateEntryViews] = useState(null)
-  const [startDateExitViews, setStartDateExitViews] = useState(null)
-  const [endDateExitViews, setEndDateExitViews] = useState(null)
-  const [totalEntriesByRoute, setTotalEntriesByRoute] = useState([])
-  const [totalExitsByRoute, setTotalExitsByRoute] = useState([])
-  const [totalEntriesByRouteFormatted, setTotalEntriesByRouteFormatted] = useState([])
-  const [totalExitsByRouteFormatted, setTotalExitsByRouteFormatted] = useState([])
-
-// Monthly 
-  const [totalVisitsByMonth, setTotalVisitsByMonth] = useState([])
-  const [totalVisitsByMonthFormatted, setTotalVisitsByMonthFormatted] = useState([])
-// End Monthly
   const [widgetStatsEndDate, setWidgetStatsEndDate] = useState(widgetStatsEndDateInitial)
   const [widgetStatsStartDate, setWidgetStatsStartDate] = useState(widgetStatsStartDateInitial)
-  // Utility Functions
-  const exceededTruncated = (values, limit) => {
-    return values.slice(0, limit)
-  }
 
-  const formatDateHuman = (date, options) => {
-    const dateTimeFormatHuman = new Intl.DateTimeFormat('en-US', options).format(date)
-    return dateTimeFormatHuman
-  }
-
-  const truncateString = (string, maxLength) => {
-    if (string.length > maxLength) {
-      if (string.includes('-')) {
-        const coursesRemoved = string.replace('/courses', '')
-        if (coursesRemoved.length <= maxLength) { return coursesRemoved}
-        const words = coursesRemoved.split('-')
-
-        const truncator = () => {
-          const len = words.reduce(
-            (accumulator, currentValue) => accumulator + currentValue.length,
-            0
-          )
-
-          if(len > maxLength) {
-            words.splice(-1,1)
-            return truncator()
-          } else {
-            return words.join('-')
-          }
-        }
-        return truncator()
-      }
-      // check for spaces
-  
-    } else {
-      return string
-    }
-  }
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/entry?startdate=${startDate}&enddate=${endDate}`, requestOptions)
-        const result = await response.json()
-
-        if(result.status === 'ok') {
-          const dateOptions = {
-            month: 'long',
-            day: 'numeric'
-          }
-
-          setStartDateEntryViews(formatDateHuman(startDateJs, dateOptions))
-          setEndDateEntryViews(formatDateHuman(endDateJs, dateOptions))
-  
-          const { data: tebr } = result
-          setTotalEntriesByRoute(tebr)
-
-          const sortedTotalEntriesByRoute = tebr.toSorted((a, b) => {
-            return b.entry_page_count - a.entry_page_count
-          })
-
-          const totalSortedEntriesByRoute = sortedTotalEntriesByRoute.map(item => {
-            const { 'entry_page': dataLabel, 'entry_page_count': value } = item
-            const dlt = truncateString(dataLabel, 14)
-            return({ dataLabel: dlt, value })
-          })
-
-          const totalSortedEntriesByRouteFinal = totalSortedEntriesByRoute.length > 7 ? exceededTruncated(totalSortedEntriesByRoute, 7) : totalSortedEntriesByRoute
-
-          setTotalEntriesByRouteFormatted(totalSortedEntriesByRouteFinal)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const requestOptions = {
-        method: 'GET',
-        headers: {
-          'api-key': apiKeyRead
-        }
-      }
-  
-      try {
-        const endDateJs = new Date()
-        const startDateJs = new Date()
-        startDateJs.setDate(startDateJs.getDate() - 6)
-        
-        const endDate = formatDateJs(endDateJs)
-        const startDate = formatDateJs(startDateJs)
-
-        const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/pages/exit?startdate=${startDate}&enddate=${endDate}`, requestOptions)
-        const result = await response.json()
-
-        if(result.status === 'ok') {
-          const dateOptions = {
-            month: 'long',
-            day: 'numeric'
-          }
-
-          setStartDateExitViews(formatDateHuman(startDateJs, dateOptions))
-          setEndDateExitViews(formatDateHuman(endDateJs, dateOptions))
-  
-          const { data: texbr } = result
-          setTotalExitsByRoute(texbr)
-
-          const sortedTotalExitsByRoute = texbr.toSorted((a, b) => {
-            return b.exit_page_count - a.exit_page_count
-          })
-
-          const totalSortedExitsByRoute = sortedTotalExitsByRoute.map(item => {
-            const { 'exit_page': dataLabel, 'exit_page_count': value } = item
-            const dlt = truncateString(dataLabel, 14)
-            return({ dataLabel: dlt, value })
-          })
-
-          const totalSortedExitsByRouteFinal = totalSortedExitsByRoute.length > 7 ? exceededTruncated(totalSortedExitsByRoute, 7) : totalSortedExitsByRoute
-
-          setTotalExitsByRouteFormatted(totalSortedExitsByRouteFinal)
-        }
-      } catch (error) {
-        console.log(error)
-      }
-    }
-    fetchData()
-  }, [])
-// Monthly
-useEffect(() => {
-  const fetchData = async () => {
-    const requestOptions = {
-      method: 'GET',
-      headers: {
-        'api-key': apiKeyRead
-      }
-    }
-
-    try {
-      const endDateJs = new Date()
-      const startDateJs = new Date()
-      startDateJs.setDate(startDateJs.getDate() - 6)
-      
-      const endDate = formatDateJs(endDateJs)
-      const startDate = formatDateJs(startDateJs)
-
-      const response = await fetch(`${baseAnalyticsApiUrl}/api/v1/sessions/by-month`, requestOptions)
-      const result = await response.json()
-
-      if(result.status === 'ok') {
-        // const dateOptions = {
-        //   month: 'long',
-        //   day: 'numeric'
-        // }
-
-        const { data: { totalVisitsByMonth : tvbm } } = result
-        setTotalVisitsByMonth(tvbm)
-
-        // const sortedTotalExitsByRoute = texbr.toSorted((a, b) => {
-        //   return b.exit_page_count - a.exit_page_count
-        // })
-
-        const totalVisitsByMonthFinal = tvbm.map(item => {
-          const { 'month': yearMonth, 'count': value } = item
-
-          const dayParts = yearMonth.split('-')
-          const jsDate = new Date(dayParts[0], dayParts[1] - 1)
-
-          const options = { month: 'short' }
-          const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
-          const dateFormatted = dateTimeFormat.format(jsDate)
-          return({ month: dateFormatted, value })
-        })
-
-        // const totalSortedExitsByRouteFinal = totalSortedExitsByRoute.length > 7 ? exceededTruncated(totalSortedExitsByRoute, 7) : totalSortedExitsByRoute
-
-        setTotalVisitsByMonthFormatted(totalVisitsByMonthFinal)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-  }
-  fetchData()
-}, [])
-// End Monthly
-
-  const ChartBarEntryPages = () => (
-    <ChartBar
-      categoryKey='dataLabel'
-      chartData={totalEntriesByRouteFormatted}
-      seriesName='Views'
-      startFromValue={0}
-    />
-  )
-
-  const ChartBarExitPages = () => (
-    <ChartBar
-      categoryKey='dataLabel'
-      chartData={totalExitsByRouteFormatted}
-      seriesName='Views'
-      startFromValue={0}
-    />
-  )
 
   return(
     <>
@@ -365,35 +133,32 @@ useEffect(() => {
         </Grid>
       </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
-      <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartBarEntryPages}
-            subtitle={`${startDateEntryViews} to ${endDateEntryViews}`}
+        <Grid xs={12} md={6} lg={4} xl={3}>
+          <LayoutRankedCategories
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
+            endpoint="api/v1/pages/entry"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
+            statisticKey="data"
+            statisticCategoryKey="entry_page"
+            statisticValueKey="entry_page_count"
             title="Entry Pages by Views"
           />
         </Grid>
         <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutChart
-            chart={ChartBarExitPages}
-            subtitle={`${startDateExitViews} to ${endDateExitViews}`}
-            source="No Car Gravel"
-            title="Exit Pages by Views"
-          />
-        </Grid>
-        <Grid xs={12} md={6} lg={4} xl={3}>
-          <LayoutPartOfWhole
+          <LayoutRankedCategories
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
-            endpoint="api/v1/pages/routes/components/total-time"
-            queryString={`?componentName=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
-            shouldFormatSlug={true}
+            endpoint="api/v1/pages/exit"
+            queryString={`?startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             source="No Car Gravel"
             statisticKey="data"
-            statisticCategoryKey="component_summary"
-            statisticValueKey="total_time"
-            title="Courses by Viewing Time"
+            statisticCategoryKey="exit_page"
+            statisticValueKey="exit_page_count"
+            title="Exit Pages by Views"
           />
         </Grid>
       </Grid>
