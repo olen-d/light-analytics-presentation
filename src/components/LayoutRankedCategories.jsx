@@ -2,17 +2,21 @@ import { PropTypes } from 'prop-types'
 
 import useFetchData from '../hooks/useFetchData'
 
-import ChartPie from './ChartPie'
+import ChartBar from './ChartBar'
 import LayoutChartChildren from './LayoutChartChildren'
 
-const LayoutPartOfWhole = ({
+const LayoutRankedCategories = ({
   apiKeyRead,
   baseAnalyticsApiUrl,
+  categoryLabelFormatOptions,
+  categoryLaybelLengthLimit = 14,
+  categoryLimit = 7,
   endpoint,
   dateRangeFormatOptions,
   queryString = '',
   seriesName,
-  shouldFormatSlug = false,
+  shouldLimitCategory = true,
+  shouldTruncateCategoryLabel = true,
   source,
   statisticKey,
   statisticCategoryKey,
@@ -20,30 +24,14 @@ const LayoutPartOfWhole = ({
   title,
   valueFormatOptions
 }) => {
-  const exceededFormatted = values => {
-    const categories = values.slice(0,4)
-    const others = values.slice(4)
-
-    const otherTotal = others.reduce((sum, { value }) => sum + value, 0)
-    categories.push({ dataLabel: 'Other', value: otherTotal})
-
-    return categories
-  }
-
   const formatDate = (dateObj, options) => {
     const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
     const dateFormatted = dateTimeFormat.format(dateObj)
     return dateFormatted
   }
 
-  const formatSlug = slug => {
-    return slug
-      .toLowerCase()
-      .split('-')
-      .map(item => {
-        return item[0].toUpperCase() + item.substr(1)
-      })
-      .join(' ')
+  const truncateSeries = (values, limit) => {
+    return values.slice(0, limit)
   }
 
   const url = `${baseAnalyticsApiUrl}/${endpoint}${queryString}`
@@ -52,6 +40,35 @@ const LayoutPartOfWhole = ({
     apiKey: apiKeyRead,
     method: 'GET',
     url
+  }
+
+  const truncateString = (string, maxLength) => {
+    if (string.length > maxLength) {
+      if (string.includes('-')) {
+        const coursesRemoved = string.replace('/courses', '')
+        if (coursesRemoved.length <= maxLength) { return coursesRemoved}
+        const words = coursesRemoved.split('-')
+
+        const truncator = () => {
+          const len = words.reduce(
+            (accumulator, currentValue) => accumulator + currentValue.length,
+            0
+          )
+
+          if(len > maxLength) {
+            words.splice(-1,1)
+            return truncator()
+          } else {
+            return words.join('-')
+          }
+        }
+        return truncator()
+      }
+      // check for spaces
+  
+    } else {
+      return string
+    }
   }
 
   const { fetchResult, isLoading, error } = useFetchData(requestConfig)
@@ -92,31 +109,28 @@ const LayoutPartOfWhole = ({
         return b[statisticValueKey] - a[statisticValueKey]
       })
 
-      const seriesFormatted = seriesSorted.map(item => {
-        const dataLabel = shouldFormatSlug ? formatSlug(item[statisticCategoryKey]) : item[statisticCategoryKey]
-        const value = item[statisticValueKey]
+      const seriesLimited = shouldLimitCategory ? truncateSeries(seriesSorted, categoryLimit) : seriesSorted
 
-        return({ dataLabel, value })
+      const seriesTruncated = seriesLimited.map(item => {
+        const { [statisticCategoryKey]: dataLabel, [statisticValueKey]: value } = item
+        const dataLabelTruncated = truncateString(dataLabel, categoryLaybelLengthLimit)
+        return({ [statisticCategoryKey]: dataLabelTruncated, [statisticValueKey]: value })
       })
 
-      const seriesFinal = seriesFormatted.length > 5 ? exceededFormatted(seriesFormatted) : seriesFormatted
+      const seriesFinal = shouldTruncateCategoryLabel ? seriesTruncated : seriesLimited
 
       return(
         <>
           <LayoutChartChildren
-            chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
-            chartData={seriesFinal}
             source={source}
             subtitle={`${startDateHumanReadable} to ${endDateHumanReadable}`}
             title={title}
           >
-            <ChartPie
-              categoryName='Days'
-              categoryKey='day'
-              chartColors={['#94fa70', '#00cd9c', '#0095a4', '#006291', '#292f56']}
+            <ChartBar
+              categoryKey={statisticCategoryKey}
               chartData={seriesFinal}
-              seriesName={seriesName}
-              startAngle={-90}
+              seriesName='Views'
+              startFromValue={0}
               valueKey={statisticValueKey}
             />
           </LayoutChartChildren>
@@ -126,22 +140,4 @@ const LayoutPartOfWhole = ({
   }
 }
 
-const { bool, object, string } = PropTypes
-
-LayoutPartOfWhole.propTypes = {
-  apiKeyRead: string,
-  baseAnalyticsApiUrl: string,
-  endpoint: string,
-  dateRangeFormatOptions: object,
-  queryString: string,
-  seriesName: string,
-  shouldFormatSlug: bool,
-  source: string,
-  statisticKey: string,
-  statisticCategoryKey: string,
-  statisticValueKey: string,
-  title: string,
-  valueFormatOptions: string
-}
-
-export default LayoutPartOfWhole
+export default LayoutRankedCategories

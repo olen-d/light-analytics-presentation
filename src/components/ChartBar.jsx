@@ -11,7 +11,8 @@ const ChartBar = (
     categoryKey,
     chartData,
     seriesName,
-    startFromValue
+    startFromValue,
+    valueKey
   }
 ) => {
   const x0 = 100
@@ -24,8 +25,8 @@ const ChartBar = (
 
   const xAxisY = y0 +  yAxisLength
 
-  const dataXMax = chartData.length > 0 ? chartData.reduce((a, b) => a.value > b.value ? a : b).value : 0
-  const dataXMin = chartData.length > 0 ? chartData.reduce((a, b) => a.value < b.value ? a : b).value : 0
+  const dataXMax = chartData.length > 0 ? chartData.reduce((a, b) => a[valueKey] > b[valueKey] ? a : b)[valueKey] : 0
+  const dataXMin = chartData.length > 0 ? chartData.reduce((a, b) => a[valueKey] < b[valueKey] ? a : b)[valueKey] : 0
 
   const dataXMinAdjusted = isNaN(startFromValue) ? dataXMin : startFromValue
 
@@ -129,7 +130,7 @@ const ChartBar = (
           {categoryName}
         </text>
 
-        {chartData.map(({ [categoryKey]: category, value }, index) => {
+        {chartData.map(({ [categoryKey]: category, [valueKey]: value }, index) => {
           const y = y0 + index * barPlotHeight
           const xRatio = (value - dataXMinAdjusted ) / dataXRange
           // const x = x0 + (1 - xRatio) * xAxisLength
@@ -170,7 +171,8 @@ ChartBar.propTypes = {
   categoryKey: string,
   chartData: array,
   seriesName: string,
-  startFromValue: number
+  startFromValue: number,
+  valueKey: string
 }
 
 export default ChartBar
