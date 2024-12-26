@@ -91,12 +91,15 @@ const DisplayStatisticNumber = ({
   )
 }
 
-const { bool, number, string } = PropTypes
+const { bool, instanceOf, number, string } = PropTypes
 
 DisplayStatisticNumber.propTypes = {
+  endDate: instanceOf(Date),
   format: string,
   reverseChangeColors: bool,
   round: number,
+  startDate: instanceOf(Date),
+  statisticChange: number,
   statisticName: string,
   statisticValue: number
 }
