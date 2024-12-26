@@ -56,10 +56,12 @@ const SelectPeriod = ({
     const dateString = formatDateQueryString(dateTime)
 
     const hoursJs = dateTime.getHours()
+    const hours = hoursJs.toString().padStart(2, '0')
     const minutesJs = dateTime.getMinutes()
+    const minutes = minutesJs.toString().padStart(2, '0')
     const secondsJs = dateTime.getSeconds()
 
-    return `${dateString}T${hoursJs}:${minutesJs}:${secondsJs}`
+    return `${dateString}T${hours}:${minutes}:${secondsJs}`
   }
 
   const handleChange = event => {

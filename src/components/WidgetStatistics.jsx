@@ -34,8 +34,8 @@ const WidgetStatistics = ({
       const { data: { startDate, endDate }, } = fetchResult
 
       const offset = new Date().getTimezoneOffset()
-      let endDateProcessed = endDate
-      let startDateProcessed = startDate
+      let endDateProcessed = new Date(endDate)
+      let startDateProcessed = new Date(startDate)
 
       if (!endDate.includes('T')) {
         endDateProcessed = new Date(endDate)
