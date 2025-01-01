@@ -169,6 +169,13 @@
   padding-top: 3rem;
 }
 
+.selected-site-title {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: left;
+  color: #4a4a4a;
+}
+
 .widget-statistics-title {
   font-size: 1.5rem;
   color: #333;

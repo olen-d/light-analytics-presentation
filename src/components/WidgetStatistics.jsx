@@ -24,11 +24,11 @@ const WidgetStatistics = ({
     url
   }
 
-  const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+  const { fetchResult, isLoading, error } = useFetchData(requestConfig) ?? {} // useFetchData returns undefined if data is stale, avoid destructuring undefined
   if (isLoading) {
     return 'Loading...'
   } else {
-    if (fetchResult.status === 'ok') {
+    if (fetchResult && fetchResult.status === 'ok') {
       const statisticValue = fetchResult.data[statisticKey]
       const statisticChange = fetchResult.data[statisticChangeKey]
       const { data: { startDate, endDate }, } = fetchResult
@@ -69,6 +69,7 @@ WidgetStatistics.propTypes = {
   apiKeyRead: string,
   baseAnalyticsApiUrl: string,
   endpoint: string,
+  queryString: string,
   reverseChangeColors: bool,
   round: number,
   statisticChangeKey: string,

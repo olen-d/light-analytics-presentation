@@ -55,7 +55,6 @@ const DisplayStatisticNumber = ({
 
   const formatDate = dateStr => {
     const jsDate = new Date(dateStr)
-
     const dateOptions = { day: 'numeric', month: 'short', year: 'numeric' }
     const dateFormat = new Intl.DateTimeFormat('en-US', dateOptions)
     const dateFormatted = dateFormat.format(jsDate)
