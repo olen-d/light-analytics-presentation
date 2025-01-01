@@ -7,7 +7,8 @@ const ChartLine = (
     chartData,
     chartSize = 'xs',
     seriesName,
-    startFromValue
+    startFromValue,
+    valueKey = 'count'
   }
 ) => {
   let SVG_WIDTH = 300
@@ -43,13 +44,15 @@ const ChartLine = (
 
   const xAxisY = y0 +  yAxisLength
 
-  const dataYMax = chartData.length > 0 ? chartData.reduce((a, b) => a.value > b.value ? a : b).value : 0
-  const dataYMin = chartData.length > 0 ? chartData.reduce((a, b) => a.value < b.Value ? a : b).value : 0
+  const dataLength = chartData?.length || 0
+
+  const dataYMax = dataLength > 0 ? chartData.reduce((a, b) => a[valueKey] > b[valueKey] ? a : b)[valueKey] : 0
+  const dataYMin = dataLength > 0 ? chartData.reduce((a, b) => a[valueKey] < b[valueKey] ? a : b)[valueKey] : 0
 
   const dataYMinAdjusted = isNaN(startFromValue) ? dataYMin : startFromValue
   const dataYRange = dataYMax - dataYMinAdjusted
 
-  const xWidth = xAxisLength / chartData.length
+  const xWidth = xAxisLength / dataLength
 
   const categoryNameOffset = categoryName.length * 3.5
   const seriesNameOffset = seriesName.length * 3
@@ -90,10 +93,32 @@ const ChartLine = (
 
   const numYTicks = dataYMax / tickInterval
 
+  let shouldSkipCategoryLabel = false
+  let skipCategoryLabelInterval = 0
+
+  switch (chartSize) {
+    case 'xs':
+      shouldSkipCategoryLabel = true
+      skipCategoryLabelInterval = dataLength > 24 ? 6 : dataLength > 8 ? 3 : 2
+      break
+    case 'sm':
+      shouldSkipCategoryLabel = dataLength > 8
+      skipCategoryLabelInterval = dataLength >= 24 ? 3 : 2
+      break
+    case 'md':
+      shouldSkipCategoryLabel = dataLength >= 24
+      skipCategoryLabelInterval = 2
+      break
+    case 'lg':
+      shouldSkipCategoryLabel = false
+      skipCategoryLabelInterval = 0
+      break
+  }
+
   let path = ''
 
   const getLinePoints = () => {
-    path += chartData.map(({ [categoryKey]: category, value }, index) => {
+    path += chartData.map(({ [categoryKey]: category, [valueKey]: value }, index) => {
       const x = x0 + index * xWidth
       const yRatio = (value - dataYMinAdjusted ) / dataYRange
       const y = y0 + (1 - yRatio) * yAxisLength
@@ -102,7 +127,7 @@ const ChartLine = (
     return path.trim()
   }
 
-  if (chartData.length <= 0) {
+  if (dataLength <= 0) {
     return null
   }
 
@@ -161,8 +186,9 @@ const ChartLine = (
                 points={`${getLinePoints()}`}
                 className='chart-line-series-1'
               />
-              {chartData.map(({ [categoryKey]: category, value }, index) => {
+              {chartData.map(({ [categoryKey]: category, [valueKey]: value }, index) => {
                 const x = x0 + index * xWidth
+                const shouldPrintCategoryLabel = !shouldSkipCategoryLabel || index % skipCategoryLabelInterval === 0
                 return(
                   <g key={index}>
                     <circle 
@@ -171,14 +197,17 @@ const ChartLine = (
                       cy={y0 + (1 - (value - dataYMinAdjusted ) / dataYRange) * yAxisLength}
                       className="chart-line-point-series-1"
                     />
-                    <text
-                      className='chart-text-label-category'
-                      x={x}
-                      y={xAxisY + 24}
-                      textAnchor='middle'
-                    >
-                      {category}
-                    </text>
+                    {
+                      shouldPrintCategoryLabel &&
+                      <text
+                        className='chart-text-label-category'
+                        x={x}
+                        y={xAxisY + 24}
+                        textAnchor='middle'
+                      >
+                        {category}
+                      </text>
+                    }
                   </g>
                   )
                 })
@@ -197,7 +226,8 @@ ChartLine.propTypes = {
   chartData: array,
   chartSize: string,
   seriesName: string,
-  startFromValue: number
+  startFromValue: number,
+  valueKey: string
 }
 
 export default ChartLine

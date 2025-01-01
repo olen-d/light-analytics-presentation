@@ -14,6 +14,7 @@ const useFetchData = (requestConfig) => {
   const [fetchResult, setFetchResult] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [previous, setPrevious] = useState(requestConfig.url)
 
   useEffect(() => {
     const requestOptions = {}
@@ -48,6 +49,12 @@ const useFetchData = (requestConfig) => {
 
     fetchData()
   }, [requestConfig.apiKey, requestConfig.method, requestConfig.url])
+
+  if (previous !== requestConfig.url) {
+    setPrevious(requestConfig.url)
+    setFetchResult(undefined)
+    return undefined
+  }
 
   return {
     fetchResult,

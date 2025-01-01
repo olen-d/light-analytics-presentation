@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react'
 
 import useFetchData from '../hooks/useFetchData'
 
-import ChartLine from '../components/ChartLine'
-import LayoutChart from '../components/LayoutChart'
+import LayoutTimeSeries from '../components/LayoutTimeSeries'
 import SelectPeriod from '../components/SelectPeriod'
-import SubtitleChart from '../components/SubtitleChart'
 import TableBasic from '../components/TableBasic'
 import WidgetStatistics from '../components/WidgetStatistics'
 
@@ -16,65 +14,16 @@ const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
 
 const VisitorsView = () => {
   const [chartSize, setChartSize] = useState(null)
-  const [widgetQueryString, setWidgetQueryString] = useState('')
-
-  const MonthlyVisits = () => {
-
-    const url = `${baseAnalyticsApiUrl}/api/v1/sessions/by-month`
-    const requestConfig = {
-      apiKey: apiKeyRead,
-      method: 'GET',
-      url
-    }
-
-    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
-    if (isLoading) {
-      return 'Loading...'
-    } else {
-      const { data: { totalVisitsByMonth : tvbm } } = fetchResult
-
-      const startDateYearMonth = tvbm[0].month
-      const endDateYearMonth = tvbm[tvbm.length -1].month
-
-      const startDateDayParts = startDateYearMonth.split('-')
-      const endDateDayParts = endDateYearMonth.split('-')
-
-      const startDateJsDate = new Date(startDateDayParts[0], startDateDayParts[1] -1)
-      const endDateJsDate = new Date(endDateDayParts[0], endDateDayParts[1] -1)
-
-      const startEndDateOptions = { month: 'long', year: 'numeric' }
-      const startEndDateTimeFormat = new Intl.DateTimeFormat('en-US', startEndDateOptions)
-
-      const startDateFormatted = startEndDateTimeFormat.format(startDateJsDate)
-      const endDateFormatted = startEndDateTimeFormat.format(endDateJsDate)
-    
-      const totalVisitsByMonthFinal = tvbm.map(item => {
-        const { 'month': yearMonth, 'count': value } = item
-
-        const dayParts = yearMonth.split('-')
-        const jsDate = new Date(dayParts[0], dayParts[1] - 1)
-
-        const options = { month: 'short' }
-        const dateTimeFormat = new Intl.DateTimeFormat('en-US', options)
-        const dateFormatted = dateTimeFormat.format(jsDate)
-        return({ month: dateFormatted, value })
-      })
-
-      return(
-        <>
-          <SubtitleChart subtitle={`${startDateFormatted} to ${endDateFormatted}`} />
-          <ChartLine
-            categoryName='Months'
-            categoryKey='month'
-            chartData={totalVisitsByMonthFinal}
-            chartSize={chartSize}
-            seriesName='Visits'
-            startFromValue={0}
-          />
-        </>
-      )
-    }
-  }
+  const [periodInterval, setPeriodInterval] = useState('')
+  const [periodQueryString, setPeriodQueryString] = useState('')
+  const [timeSeriesCategoryKey, setTimeSeriesCategoryKey] = useState('month')
+  const [timeSeriesCategoryName, setTimeSeriesCategoryName] = useState('Months')
+  const [timeSeriesDateLabelFormatOptions, setTimeSeriesDateLabelFormatOptions] = useState({ month: 'short' })
+  const [timeSeriesDateRangeFormatOptions, setTimeSeriesDateRangeFormatOptions] = useState({ month: 'long', year: 'numeric' })
+  const [timeSeriesEndpointInterval, setTimeSeriesEndpointInterval] = useState('by-month')
+  const [timeSeriesIntervalFormatted, setTimeSeriesIntervalFormatted] = useState('Month')
+  const [timeSeriesStatisticKey, setTimeSeriesStatisticKey] = useState('totalVisitsByMonth')
+  const [timeSeriesStatisticTimeKey, setTimeSeriesStatisticTimeKey] = useState('month')
 
   // const MonthlyVisitsSummary = () => {
   //   const url = `${baseAnalyticsApiUrl}/api/v1/sessions/summary/by-month`
@@ -182,8 +131,44 @@ const VisitorsView = () => {
     }
   }
 
-  const handleWidgetQueryString = data => {
-    setWidgetQueryString(data)
+  const handlePeriodChange = data => {
+    const { interval, queryString } = data
+
+    setPeriodInterval(interval)
+    setPeriodQueryString(queryString)
+
+    switch (interval) {
+      case 'd':
+        setTimeSeriesCategoryKey('day')
+        setTimeSeriesCategoryName('Days')
+        setTimeSeriesDateLabelFormatOptions({ month: 'numeric', day: 'numeric' })
+        setTimeSeriesDateRangeFormatOptions({ month: 'long', day: 'numeric' })
+        setTimeSeriesEndpointInterval('by-day')
+        setTimeSeriesIntervalFormatted('Day')
+        setTimeSeriesStatisticKey('totalVisitsByDay')
+        setTimeSeriesStatisticTimeKey('day')
+        break
+      case 'h':
+        setTimeSeriesCategoryKey('hour')
+        setTimeSeriesCategoryName('Hours')
+        setTimeSeriesDateLabelFormatOptions({ hour: 'numeric' })
+        setTimeSeriesDateRangeFormatOptions({ month: 'long', day: 'numeric', hour: 'numeric' })
+        setTimeSeriesEndpointInterval('by-hour')
+        setTimeSeriesIntervalFormatted('Hour')
+        setTimeSeriesStatisticKey('totalVisitsByHour')
+        setTimeSeriesStatisticTimeKey('hour')
+        break
+      case 'm':
+        setTimeSeriesCategoryKey('month')
+        setTimeSeriesCategoryName('Months')
+        setTimeSeriesDateLabelFormatOptions({ month: 'short' })
+        setTimeSeriesDateRangeFormatOptions({ month: 'long', year: 'numeric' })
+        setTimeSeriesEndpointInterval('by-month')
+        setTimeSeriesIntervalFormatted('Month')
+        setTimeSeriesStatisticKey('totalVisitsByMonth')
+        setTimeSeriesStatisticTimeKey('month')
+        break
+    }
   }
 
   useEffect(() => {
@@ -211,21 +196,10 @@ const VisitorsView = () => {
  
   return(
     <div className='visitors-view'>
-      <h1 className="admin-lead extended">Administration &raquo; Visitors</h1>
-      <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
-        <Grid size={12}>
-          <LayoutChart
-            chart={MonthlyVisits}
-            source="No Car Gravel"
-            title="Visits by Month"
-          />
-        </Grid>
-      </Grid>
-      {/* <MonthlyVisitsSummary /> */}
-      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }} sx={{ mb: '2rem', pt: '7rem'}}>
         <Grid xs={12} sm={6} md={9}>
-          <div className="widget-statistics-title">
-            Visitor Statistics
+          <div className="selected-site-title">
+            nocargravel.cc
           </div>
         </Grid>
         <Grid xs={12} sm={6} md={3}>
@@ -233,15 +207,46 @@ const VisitorsView = () => {
             id="visitor-statistics-period"
             initialPeriod="forever"
             labeltext="period"
-            onQueryString={handleWidgetQueryString}
+            onSelect={handlePeriodChange}
           />
+        </Grid>
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
+        <Grid size={12}>
+        <LayoutTimeSeries
+            apiKeyRead={apiKeyRead}
+            baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            categoryKey={timeSeriesCategoryKey}
+            categoryName={timeSeriesCategoryName}
+            chartSize={chartSize}
+            chartType='line'
+            dateLabelFormatOptions={timeSeriesDateLabelFormatOptions}
+            dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
+            endpoint={`api/v1/sessions/${timeSeriesEndpointInterval}`}
+            queryString={periodQueryString}
+            seriesName="Visits"
+            source="No Car Gravel"
+            statisticKey={timeSeriesStatisticKey}
+            statisticTimeKey={timeSeriesStatisticTimeKey}
+            statisticValueKey="count"
+            title={`Visits by ${timeSeriesIntervalFormatted}`}
+          />
+        </Grid>
+      </Grid>
+
+      {/* <MonthlyVisitsSummary /> */}
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={12}>
+          <div className="widget-statistics-title">
+            Visitor Statistics
+          </div>
         </Grid>
         <Grid xs={6} md={4} lg={3} xl={2}>
           <WidgetStatistics
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions"
-            queryString={widgetQueryString}
+            queryString={periodQueryString}
             statisticChangeKey="totalVisitsChange"
             statisticKey="totalVisits"
             statisticName="Total Visits"
@@ -252,7 +257,7 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/unique"
-            queryString={widgetQueryString}
+            queryString={periodQueryString}
             statisticChangeKey="uniqueVisitsChange"
             statisticKey="uniqueVisits"
             statisticName="Unique Visits"
@@ -263,7 +268,7 @@ const VisitorsView = () => {
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/pages/time-on-pages/average"
-            queryString={widgetQueryString}
+            queryString={periodQueryString}
             statisticChangeKey={"timeOnPageAverageChange"}
             statisticFormat="elapsedTime"
             statisticKey="timeOnPageAverage"
@@ -276,7 +281,7 @@ const VisitorsView = () => {
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             endpoint="api/v1/sessions/bounce-rate"
             reverseChangeColors={true}
-            queryString={widgetQueryString}
+            queryString={periodQueryString}
             statisticChangeKey={"bounceRateChange"}
             statisticFormat="percent"
             statisticKey="bounceRate"
