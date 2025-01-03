@@ -54,8 +54,8 @@ const ChartLine = (
 
   const xWidth = xAxisLength / dataLength
 
-  const categoryNameOffset = categoryName.length * 3.5
-  const seriesNameOffset = seriesName.length * 3
+  const categoryNameOffset = categoryName?.length * 3.5 || 0
+  const seriesNameOffset = seriesName?.length * 3 || 0
 
   let tickInterval = 0
 

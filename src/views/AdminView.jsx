@@ -33,12 +33,20 @@ const AdminView = () => {
 
   return(
     <>
-      <h1 className="admin-lead extended">Administration</h1>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }} sx={{ mb: '2rem', pt: '7rem'}}>
+        <Grid xs={12} sm={6} md={9}>
+          <div className="selected-site-title">
+            nocargravel.cc
+          </div>
+        </Grid>
+      </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm: 0, md: 10}}>
         <Grid xs={12} md={6} lg={4} xl={3}>
           <LayoutTimeSeries
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            categoryKey='day'
+            categoryName='Days'
             dateLabelFormatOptions={{ weekday: 'short' }}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/sessions/by-day"
@@ -55,6 +63,8 @@ const AdminView = () => {
         <LayoutTimeSeries
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            categoryKey='day'
+            categoryName='Days'
             dateLabelFormatOptions={{ weekday: 'short' }}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/pages/by-day"
@@ -71,6 +81,8 @@ const AdminView = () => {
         <LayoutTimeSeries
             apiKeyRead={apiKeyRead}
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+            categoryKey='day'
+            categoryName='Days'
             dateLabelFormatOptions={{ weekday: 'short' }}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/pages/by-day"

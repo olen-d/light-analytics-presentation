@@ -204,7 +204,7 @@ const LayoutTimeSeries = ({
             {
               chartType === 'column' &&
               <ChartColumn
-                categoryName='Days'
+                categoryName={categoryName}
                 categoryKey={categoryKey}
                 chartData={seriesWithZerosFormatted}
                 seriesName={seriesName}
@@ -219,7 +219,7 @@ const LayoutTimeSeries = ({
                 categoryKey={categoryKey}
                 chartData={seriesWithZerosFormatted}
                 chartSize={chartSize}
-                seriesName='Visits'
+                seriesName={seriesName}
                 startFromValue={0}
               />
             }

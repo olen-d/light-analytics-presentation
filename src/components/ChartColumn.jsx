@@ -1,5 +1,3 @@
-'use strict'
-
 import { PropTypes } from 'prop-types'
 
 const SVG_WIDTH = 300
@@ -36,8 +34,8 @@ const ChartColumn = (
 
   const columnPadding = 4
 
-  const categoryNameOffset = categoryName.length * 3.5
-  const seriesNameOffset = seriesName.length * 3
+  const categoryNameOffset = categoryName?.length * 3.5 || 0
+  const seriesNameOffset = seriesName?.length * 3 || 0
 
   let tickInterval = 0
 
@@ -167,7 +165,8 @@ ChartColumn.propTypes = {
   categoryKey: string,
   chartData: array,
   seriesName: string,
-  startFromValue: number
+  startFromValue: number,
+  valueKey: string
 }
 
 export default ChartColumn
