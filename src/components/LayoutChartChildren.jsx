@@ -5,7 +5,7 @@ import SourceChart from './SourceChart'
 import SubtitleChart from './SubtitleChart'
 import TitleChart from './TitleChart'
 
-const LayoutChart = ({
+const LayoutChartChildren = ({
   chartColors,
   chartData,
   children,
@@ -26,11 +26,12 @@ const LayoutChart = ({
   )
 }
 
-const { array, number, string } = PropTypes
+const { array, node, number, string } = PropTypes
 
-LayoutChart.propTypes = {
+LayoutChartChildren.propTypes = {
   chartColors: array,
   chartData: array,
+  children: node,
   locationLegend: string,
   startAngle: number,
   subtitle: string,
@@ -38,4 +39,4 @@ LayoutChart.propTypes = {
   source: string
 }
 
-export default LayoutChart
+export default LayoutChartChildren
