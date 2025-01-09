@@ -25,11 +25,11 @@ const TableBasic = ({
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map(element => (
+            {rows.map(([id, ...rest]) => (
               <TableRow
-                key={element.shift()}
+                key={id}
               >
-                {element.map((cell, index) => (
+                {rest.map((cell, index) => (
                   index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
                 ))}
               </TableRow>
