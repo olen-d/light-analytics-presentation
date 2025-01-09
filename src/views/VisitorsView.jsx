@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import useFetchData from '../hooks/useFetchData'
-
 import LayoutTimeSeries from '../components/LayoutTimeSeries'
+import LayoutTable from '../components/LayoutTable'
 import SelectPeriod from '../components/SelectPeriod'
-import TableBasic from '../components/TableBasic'
 import WidgetStatistics from '../components/WidgetStatistics'
 
-import { Unstable_Grid2 as Grid } from '@mui/material'
+import { Unstable_Grid2 as Grid, Table } from '@mui/material'
 
 const apiKeyRead = import.meta.env.VITE_ANALYTICS_API_KEY_READ
 const baseAnalyticsApiUrl = import.meta.env.VITE_ANALYTICS_API_BASE_URL
@@ -74,63 +72,6 @@ const VisitorsView = () => {
   //   }
   // }
  
-  const CountTable = ({
-    endpoint,
-    countKey,
-    countName,
-    itemKey,
-    itemName,
-    itemNameFormat = 'none',
-    listKey
-  }) => {
-    const formatItemName = item => {
-      let itemNameFormatted = null
-
-      switch (itemNameFormat) {
-        case 'language':
-          const languageNames = new Intl.DisplayNames(['eng'], { type: 'language' })
-          itemNameFormatted = languageNames.of(item)
-          break
-        case 'none':
-        default:
-          itemNameFormatted = item
-      }
-
-      return itemNameFormatted
-    }
-
-    const url = `${baseAnalyticsApiUrl}/${endpoint}`
-
-    const requestConfig = {
-      apiKey: apiKeyRead,
-      method: 'GET',
-      url
-    }
-
-    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
-    if (isLoading) {
-      return 'Loading...'
-    } else {
-      if (fetchResult.status === 'ok') {
-        const headings = [itemName, countName]
-        const rowsData = fetchResult.data[listKey]
-
-        const rowKeys = rowsData.map(element => {
-          return element[itemKey]
-        })
-
-        const rows = rowsData.map(element => {
-          const item = element[itemKey]
-          const itemFormatted = formatItemName(item)
-          const count = element[countKey]
-          return [itemFormatted, count]
-        })
-
-        return(<TableBasic headings={headings} rows={rows} rowKeys={rowKeys} />)
-      }
-    }
-  }
-
   const handlePeriodChange = data => {
     const { interval, queryString } = data
 
@@ -292,32 +233,41 @@ const VisitorsView = () => {
       <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
         <Grid xs={12} md={6}>
           <div className="top-table">
-            <div className="table-text-title">
-              Top Referrers
-            </div>
-            <CountTable
+            <LayoutTable
+              apiKeyRead={apiKeyRead}
+              baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+              dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
               endpoint="api/v1/sessions/referrers"
-              countKey="count"
-              countName="Visitors"
-              itemKey="referrer"
-              itemName="Referrers"
-              listKey="referrers"
+              headings={['Referrers', 'Visitors']}
+              itemKeys={['id', 'referrer', 'count']}
+              queryString={periodQueryString}
+              statisticKey="referrers"
+              statisticKeyDateRange="referrer"
+              subtitle="-auto"
+              source="No Car Gravel"
+              tableType=""
+              title="Top Referrers"
             />
           </div>
         </Grid>
         <Grid xs={12} md={6}>
           <div className="top-table">
-            <div className="table-text-title">
-              Top Languages
-            </div>
-            <CountTable
+            <LayoutTable
+              apiKeyRead={apiKeyRead}
+              baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+              categoriesToFormat={[{ 'category': 'language', 'format': 'languageName' }]}
+              dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
               endpoint="api/v1/sessions/languages"
-              countKey="count"
-              countName="Visitors"
-              itemKey="language"
-              itemName="Languages"
-              itemNameFormat="language"
-              listKey="languages"
+              headings={['Languages', 'Visitors']}
+              itemKeys={['id', 'language', 'count']}
+              queryString={periodQueryString}
+              shouldFormatCategories={true}
+              statisticKey="languages"
+              statisticKeyDateRange="language"
+              subtitle="-auto"
+              source="No Car Gravel"
+              tableType=""
+              title="Top Languages"
             />
           </div>
         </Grid> 

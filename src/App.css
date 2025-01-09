@@ -32,18 +32,25 @@
   fill: #333;
 }
 
-.chart-text-source {
+.chart-text-source,
+.table-text-source {
   font-size: 0.8rem;
   color: #333;
   text-align: left;
   margin-bottom: 0.5rem;
 }
 
-.chart-text-source-label {
+.table-text-source {
+  margin-top: 1rem;
+}
+
+.chart-text-source-label,
+.table-text-source-label {
   color: #333;
 }
 
-.chart-text-subtitle {
+.chart-text-subtitle,
+.table-text-subtitle {
   font-size: 1rem;
   color: #333;
   text-align: left;
@@ -55,6 +62,9 @@
   font-size: 1.5rem;
   color: #333;
   text-align: left;
+}
+
+.chart-text-title {
   margin-bottom: 0.1rem;
 }
 
@@ -157,12 +167,15 @@
   padding-top: 2rem;
 }
 
+.table-container {
+  margin-top: 1rem;
+}
 .table-sort {
   padding-top: 4rem;
 }
 
 .table-text-title {
-  padding-bottom: 1rem;
+  padding-bottom: 0rem;
 }
 
 .top-table {

@@ -14,28 +14,30 @@ const TableBasic = ({
   rowKeys
 }) => {
   return (
-    <TableContainer component={Paper}>
-      <Table>
-        <TableHead>
-          <TableRow>
-          {headings.map((element, index) => (
-            <TableCell key={index} align="center">{element}</TableCell>
-          ))}
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {rows.map((element, index) => (
-            <TableRow
-              key={rowKeys[index]}
-            >
-              {element.map((cell, index) => (
-                index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
-              ))}
+    <div className="table-container">
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+            {headings.map((element, index) => (
+              <TableCell key={index} align="center">{element}</TableCell>
+            ))}
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </TableHead>
+          <TableBody>
+            {rows.map(element => (
+              <TableRow
+                key={element.shift()}
+              >
+                {element.map((cell, index) => (
+                  index === 0 ? <TableCell key={`tbc${index}`} component="th" scope="row">{cell}</TableCell> : <TableCell key={`tbc${index}`} align="right">{cell}</TableCell>
+                ))}
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    </div>
   )
 }
 

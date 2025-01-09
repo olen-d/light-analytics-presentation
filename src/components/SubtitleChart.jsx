@@ -1,5 +1,3 @@
-'use strict'
-
 import { PropTypes } from 'prop-types'
 
 const SubtitleChart = ({ subtitle }) => {
@@ -15,6 +13,5 @@ const { string } = PropTypes
 SubtitleChart.propTypes = {
   subtitle: string,
 }
-
 
 export default SubtitleChart

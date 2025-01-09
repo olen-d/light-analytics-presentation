@@ -1,8 +1,8 @@
 import { PropTypes } from 'prop-types'
 
-const TitleChart = ({ title }) => {
+const TitleTable = ({ title }) => {
   return (
-    <div className="chart-text-title">
+    <div className="table-text-title">
       {title}
     </div>
   )
@@ -10,8 +10,8 @@ const TitleChart = ({ title }) => {
 
 const { string } = PropTypes
 
-TitleChart.propTypes = {
+TitleTable.propTypes = {
   title: string,
 }
 
-export default TitleChart
+export default TitleTable
