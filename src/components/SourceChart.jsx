@@ -1,5 +1,3 @@
-'use strict'
-
 import { PropTypes } from 'prop-types'
 
 const SourceChart = ({ source }) => {
@@ -15,6 +13,5 @@ const { string } = PropTypes
 SourceChart.propTypes = {
   source: string,
 }
-
 
 export default SourceChart
