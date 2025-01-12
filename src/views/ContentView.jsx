@@ -3,8 +3,10 @@ import { useEffect, useState } from 'react'
 import useFetchData from '../hooks/useFetchData'
 
 import LayoutTimeSeries from '../components/LayoutTimeSeries'
+import LayoutTable from '../components/LayoutTable'
 import SelectPeriod from '../components/SelectPeriod'
 import TableSort from '../components/TableSort'
+import ToolbarOptions from '../components/ToolbarOptions'
 import WidgetStatistics from '../components/WidgetStatistics'
 
 import { Unstable_Grid2 as Grid } from '@mui/material'
@@ -24,6 +26,11 @@ const ContentView = () => {
   const [timeSeriesIntervalFormatted, setTimeSeriesIntervalFormatted] = useState('Month')
   const [timeSeriesStatisticKey, setTimeSeriesStatisticKey] = useState('totalViewsByMonth')
   const [timeSeriesStatisticTimeKey, setTimeSeriesStatisticTimeKey] = useState('month')
+  const [viewStatisticCategoriesToFormat, setViewStatisticCategoriesToFormat] = useState([])
+  const [viewStatisticEndpoint, setViewStatisticEndpoint] = useState('api/v1/pages/routes/total-views')
+  const [viewStatisticHeadings, setViewStatisticHeadings] = useState(['Route', 'Views'])
+  const [viewStatisticItemKeys, setViewStatisticItemKeys] = useState(['id', 'route', 'total_views'])
+  const [viewStatisticShouldFormatCategories, setViewStatisticShouldFormatCategories] = useState(false)
 
 
   const ContentViewsSummary = () => {
@@ -88,6 +95,34 @@ const ContentView = () => {
       })
 
       return(<TableSort headings={headings} rows={rows} rowKeys={rowKeys} />)
+    }
+  }
+
+  const handleViewStatisticChange = data => {
+    const viewStatistic = data
+    switch(viewStatistic) {
+      case 'average':
+        setViewStatisticCategoriesToFormat([{ 'category': 'time_per_view', 'format': 'elapsedTime' }])
+        setViewStatisticEndpoint('api/v1/pages/routes/time/per-view')
+        setViewStatisticHeadings(['Route', 'Average Time on Page'])
+        setViewStatisticItemKeys(['id', 'route', 'time_per_view'])
+        setViewStatisticShouldFormatCategories(true)
+        break
+      case 'unique':
+        setViewStatisticCategoriesToFormat([])
+        setViewStatisticEndpoint('api/v1/pages/routes/total-unique-views')
+        setViewStatisticHeadings(['Route', 'Unique Views'])
+        setViewStatisticItemKeys(['id', 'route', 'total_unique_views'])
+        setViewStatisticShouldFormatCategories(false)
+        break
+      case 'default':
+      case 'total':
+        setViewStatisticCategoriesToFormat([])
+        setViewStatisticEndpoint('api/v1/pages/routes/total-views')
+        setViewStatisticHeadings(['Route', 'Views'])
+        setViewStatisticItemKeys(['id', 'route', 'total_views'])
+        setViewStatisticShouldFormatCategories(false)
+      break
     }
   }
 
@@ -234,6 +269,60 @@ const ContentView = () => {
             statisticName="Time Per Pageview"
           />
         </Grid>
+      </Grid>
+      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+        <Grid xs={12} md={6}>
+          <div className="top-table">
+            <LayoutTable
+              apiKeyRead={apiKeyRead}
+              baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+              categoriesToFormat={viewStatisticCategoriesToFormat}
+              dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
+              endpoint={viewStatisticEndpoint}
+              hasChildren={true}
+              headings={viewStatisticHeadings}
+              itemKeys={viewStatisticItemKeys}
+              queryString={periodQueryString}
+              shouldFormatCategories={viewStatisticShouldFormatCategories}
+              source="No Car Gravel"
+              subtitle="-auto"
+              tableType="basic"
+              title="Top Routes"
+            >
+              <ToolbarOptions
+                handleClick={handleViewStatisticChange}
+                options={
+                  [
+                    { 'id': 1, 'option': 'Total Views', 'value': 'total' },
+                    { 'id': 2, 'option': 'Unique Views', 'value': 'unique' }, 
+                    { 'id': 3, 'option': 'Avg. Time', 'value': 'average' }
+                  ]
+                }
+              />
+            </LayoutTable>
+          </div>
+        </Grid>
+        <Grid xs={12} md={6}>
+          <div className="top-table">
+            {/* <LayoutTable
+              apiKeyRead={apiKeyRead}
+              baseAnalyticsApiUrl={baseAnalyticsApiUrl}
+              categoriesToFormat={[{ 'category': 'language', 'format': 'languageName' }]}
+              dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
+              endpoint="api/v1/sessions/languages"
+              headings={['Languages', 'Visitors']}
+              itemKeys={['id', 'language', 'count']}
+              queryString={periodQueryString}
+              shouldFormatCategories={true}
+              statisticKey="languages"
+              statisticKeyDateRange="language"
+              subtitle="-auto"
+              source="No Car Gravel"
+              tableType="basic"
+              title="Top Languages"
+            /> */}
+          </div>
+        </Grid> 
       </Grid>
       <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
         <Grid>

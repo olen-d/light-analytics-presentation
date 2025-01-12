@@ -11,8 +11,10 @@ const LayoutTable = ({
   apiKeyRead,
   baseAnalyticsApiUrl,
   categoriesToFormat,
+  children,
   dateRangeFormatOptions,
   endpoint,
+  hasChildren = false,
   headings,
   itemKeys,
   queryString,
@@ -20,7 +22,7 @@ const LayoutTable = ({
   statisticKey,
   subtitle,
   source,
-  tableType,
+  tableType = 'basic',
   title
 }) => {
   // Helper Functions
@@ -56,6 +58,13 @@ const LayoutTable = ({
     let elementFormatted = null
 
     switch (format) {
+      case 'elapsedTime':
+        const totalSeconds = Math.round(element[category] / 1000)
+        const hours = Math.floor(totalSeconds / 3600)
+        const minutes = Math.floor(totalSeconds / 60) % 60
+        const seconds = totalSeconds % 60
+        elementFormatted = `${hours > 0 ? hours+'h' : ''} ${minutes > 0 ? minutes+'m' : ''} ${seconds}s`
+        break
       case 'languageName':
         const languageNames = new Intl.DisplayNames(['eng'], { type: 'language' })
         elementFormatted = languageNames.of(element[category])
@@ -70,7 +79,6 @@ const LayoutTable = ({
   // End Helper Functions
 
   let rows = []
-  let rowsFormatted = []
   let subtitleFinal = subtitle
 
   const url = `${baseAnalyticsApiUrl}/${endpoint}${queryString}`
@@ -86,7 +94,7 @@ const LayoutTable = ({
     return 'Loading...'
   } else {
     if (fetchResult && fetchResult.status === 'ok' && fetchResult.data[statisticKey] !== -99) {
-      const rowsData = fetchResult.data[statisticKey]
+      const rowsData = statisticKey ? fetchResult.data[statisticKey] : fetchResult.data
 
       rows = rowsData.map(element => {
         const row = itemKeys.map(itemKey => {
@@ -124,10 +132,14 @@ const LayoutTable = ({
     <div className="layout-table-container">
       <TitleTable title={title} />
       <SubtitleTable subtitle={subtitleFinal} />
-      <TableBasic 
+      {hasChildren && children}
+      {
+        tableType === 'basic' &&
+        <TableBasic 
         headings={headings}
         rows={rows}
       />
+      }
       {source && <SourceTable source={source} />}
     </div>
   )
