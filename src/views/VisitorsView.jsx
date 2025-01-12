@@ -245,7 +245,7 @@ const VisitorsView = () => {
               statisticKeyDateRange="referrer"
               subtitle="-auto"
               source="No Car Gravel"
-              tableType=""
+              tableType="basic"
               title="Top Referrers"
             />
           </div>
@@ -266,7 +266,7 @@ const VisitorsView = () => {
               statisticKeyDateRange="language"
               subtitle="-auto"
               source="No Car Gravel"
-              tableType=""
+              tableType="basic"
               title="Top Languages"
             />
           </div>
