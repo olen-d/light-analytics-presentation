@@ -54,7 +54,7 @@ const LayoutTable = ({
     return dateFormatted
   }
   
-  const formatElement = (element, category, format) => {
+  const formatElement = (element, category, format, shouldRound = false, round = 0) => {
     let elementFormatted = null
 
     switch (format) {
@@ -69,11 +69,25 @@ const LayoutTable = ({
         const languageNames = new Intl.DisplayNames(['eng'], { type: 'language' })
         elementFormatted = languageNames.of(element[category])
         break
+      case 'percent':
+        const pct = element[category] * 100
+        const pctRounded = shouldRound ? rounded(round, pct) : pct
+        elementFormatted = `${pctRounded}%`
+        break
       case 'none':
       default:
         elementFormatted = element
     }
     return elementFormatted
+  }
+
+  const rounded = (round, value) => {
+    const expanded = 10 ** round * value
+    const rounded = Math.round(expanded)
+    const compressed = 10 ** (round * -1) * rounded
+    const fixed = compressed.toFixed(round)
+    const float = parseFloat(fixed)
+    return float
   }
 
   // End Helper Functions
@@ -99,7 +113,7 @@ const LayoutTable = ({
       rows = rowsData.map(element => {
         const row = itemKeys.map(itemKey => {
           const categoryIdx = shouldFormatCategories ? categoriesToFormat.findIndex(element => element.category === itemKey) : -1
-          return categoryIdx === -1 ? element[itemKey] : formatElement(element, categoriesToFormat[categoryIdx].category, categoriesToFormat[categoryIdx].format)
+          return categoryIdx === -1 ? element[itemKey] : formatElement(element, categoriesToFormat[categoryIdx].category, categoriesToFormat[categoryIdx].format, categoriesToFormat[categoryIdx]?.shouldRound, categoriesToFormat[categoryIdx]?.round)
         })
         return row
       })

@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
 
-import useFetchData from '../hooks/useFetchData'
+// import useFetchData from '../hooks/useFetchData'
 
 import LayoutTimeSeries from '../components/LayoutTimeSeries'
 import LayoutTable from '../components/LayoutTable'
 import SelectPeriod from '../components/SelectPeriod'
-import TableSort from '../components/TableSort'
+// import TableSort from '../components/TableSort'
 import ToolbarOptions from '../components/ToolbarOptions'
 import WidgetStatistics from '../components/WidgetStatistics'
 
@@ -18,6 +18,11 @@ const ContentView = () => {
   const [chartSize, setChartSize] = useState(null)
   const [periodInterval, setPeriodInterval] = useState('')
   const [periodQueryString, setPeriodQueryString] = useState('')
+  const [portalStatisticCategoriesToFormat, setPortalStatisticCategoriesToFormat] = useState([])
+  const [portalStatisticEndpoint, setPortalStatisticEndpoint] = useState('api/v1/pages/entry')
+  const [portalStatisticHeadings, setPortalStatisticHeadings] = useState(['Route', 'Entrances'])
+  const [portalStatisticItemKeys, setPortalStatisticItemKeys] = useState(['id', 'entry_page', 'entry_page_count'])
+  const [portalStatisticShouldFormatCategories, setPortalStatisticShouldFormatCategories] = useState(false)
   const [timeSeriesCategoryKey, setTimeSeriesCategoryKey] = useState('month')
   const [timeSeriesCategoryName, setTimeSeriesCategoryName] = useState('Months')
   const [timeSeriesDateLabelFormatOptions, setTimeSeriesDateLabelFormatOptions] = useState({ month: 'short' })
@@ -33,68 +38,96 @@ const ContentView = () => {
   const [viewStatisticShouldFormatCategories, setViewStatisticShouldFormatCategories] = useState(false)
 
 
-  const ContentViewsSummary = () => {
-    const url = `${baseAnalyticsApiUrl}/api/v1/pages/summary/by-route`
-    const requestConfig = {
-      apiKey: apiKeyRead,
-      method: 'GET',
-      url
-    }
+  // const ContentViewsSummary = () => {
+  //   const url = `${baseAnalyticsApiUrl}/api/v1/pages/summary/by-route`
+  //   const requestConfig = {
+  //     apiKey: apiKeyRead,
+  //     method: 'GET',
+  //     url
+  //   }
 
-    const { fetchResult, isLoading, error } = useFetchData(requestConfig)
-    if (isLoading) {
-      return 'Loading...'
-    } else {
-      const { data: { contentSummaryByRoute } } = fetchResult
+  //   const { fetchResult, isLoading, error } = useFetchData(requestConfig)
+  //   if (isLoading) {
+  //     return 'Loading...'
+  //   } else {
+  //     const { data: { contentSummaryByRoute } } = fetchResult
 
-      const formatDuration = (duration, output)  => {
-        const durationSeconds = Math.round(duration / 1000)
+  //     const formatDuration = (duration, output)  => {
+  //       const durationSeconds = Math.round(duration / 1000)
 
-        if (output === 'hh:mm:ss') {
-          const totalHours = Math.floor(durationSeconds / 3600)
-          const remainderSeconds = durationSeconds % 3600
-          const totalMinutes = Math.floor(remainderSeconds / 60)
-          const totalSeconds = remainderSeconds % 60
+  //       if (output === 'hh:mm:ss') {
+  //         const totalHours = Math.floor(durationSeconds / 3600)
+  //         const remainderSeconds = durationSeconds % 3600
+  //         const totalMinutes = Math.floor(remainderSeconds / 60)
+  //         const totalSeconds = remainderSeconds % 60
 
-          const hh = totalHours.toString().padStart(2, '0')
-          const mm = totalMinutes.toString().padStart(2, '0')
-          const ss = totalSeconds.toString().padStart(2, '0')
+  //         const hh = totalHours.toString().padStart(2, '0')
+  //         const mm = totalMinutes.toString().padStart(2, '0')
+  //         const ss = totalSeconds.toString().padStart(2, '0')
 
-          return (`${hh}:${mm}:${ss}`)
-        }
-      }
+  //         return (`${hh}:${mm}:${ss}`)
+  //       }
+  //     }
 
-      const headings = [
-        'Route',
-        'Page Views',
-        'Unique Page Views',
-        'Average Time on Page',
-        'Entrances',
-        'Exits',
-        'Bounce Rate'
-      ]
+  //     const headings = [
+  //       'Route',
+  //       'Page Views',
+  //       'Unique Page Views',
+  //       'Average Time on Page',
+  //       'Entrances',
+  //       'Exits',
+  //       'Bounce Rate'
+  //     ]
 
-      const rowKeys = contentSummaryByRoute.map(element => {
-        const { route: key } = element
-        return key
-      })
+  //     const rowKeys = contentSummaryByRoute.map(element => {
+  //       const { route: key } = element
+  //       return key
+  //     })
 
-      const rows = contentSummaryByRoute.map(element => {
-        const {
-          route,
-          totalViews,
-          uniquePageViews,
-          averageTimeOnPage,
-          entrances,
-          exits,
-          bounceRate
-        } = element
-        const averageTimeOnPageFormatted = formatDuration(averageTimeOnPage, 'hh:mm:ss')
-        const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
-        return([route, totalViews, uniquePageViews, averageTimeOnPageFormatted, entrances, exits, bounceRateFormatted])
-      })
+  //     const rows = contentSummaryByRoute.map(element => {
+  //       const {
+  //         route,
+  //         totalViews,
+  //         uniquePageViews,
+  //         averageTimeOnPage,
+  //         entrances,
+  //         exits,
+  //         bounceRate
+  //       } = element
+  //       const averageTimeOnPageFormatted = formatDuration(averageTimeOnPage, 'hh:mm:ss')
+  //       const bounceRateFormatted = `${Math.round(bounceRate * 100)}%` 
+  //       return([route, totalViews, uniquePageViews, averageTimeOnPageFormatted, entrances, exits, bounceRateFormatted])
+  //     })
 
-      return(<TableSort headings={headings} rows={rows} rowKeys={rowKeys} />)
+  //     return(<TableSort headings={headings} rows={rows} rowKeys={rowKeys} />)
+  //   }
+  // }
+
+  const handlePortalStatisticChange = data => {
+    const portalStatistic = data
+    switch(portalStatistic) {
+      case 'bounce':
+        setPortalStatisticCategoriesToFormat([{ 'category': 'bounceRate', 'format': 'percent', 'shouldRound': true }])
+        setPortalStatisticEndpoint('api/v1/pages/routes/bounce-rate')
+        setPortalStatisticHeadings(['Route', 'Bounce Rate'])
+        setPortalStatisticItemKeys(['id', 'route', 'bounceRate'])
+        setPortalStatisticShouldFormatCategories(true)
+        break
+      case 'exit':
+        setPortalStatisticCategoriesToFormat([])
+        setPortalStatisticEndpoint('api/v1/pages/exit')
+        setPortalStatisticHeadings(['Route', 'Exits'])
+        setPortalStatisticItemKeys(['id', 'exit_page', 'exit_page_count'])
+        setPortalStatisticShouldFormatCategories(false)
+        break
+      case 'default':
+      case 'enter':
+        setPortalStatisticCategoriesToFormat([])
+        setPortalStatisticEndpoint('api/v1/pages/entry')
+        setPortalStatisticHeadings(['Route', 'Entrances'])
+        setPortalStatisticItemKeys(['id', 'entry_page', 'entry_page_count'])
+        setPortalStatisticShouldFormatCategories(false)
+        break
     }
   }
 
@@ -304,31 +337,41 @@ const ContentView = () => {
         </Grid>
         <Grid xs={12} md={6}>
           <div className="top-table">
-            {/* <LayoutTable
+            <LayoutTable
               apiKeyRead={apiKeyRead}
               baseAnalyticsApiUrl={baseAnalyticsApiUrl}
-              categoriesToFormat={[{ 'category': 'language', 'format': 'languageName' }]}
+              categoriesToFormat={portalStatisticCategoriesToFormat}
               dateRangeFormatOptions={timeSeriesDateRangeFormatOptions}
-              endpoint="api/v1/sessions/languages"
-              headings={['Languages', 'Visitors']}
-              itemKeys={['id', 'language', 'count']}
+              endpoint={portalStatisticEndpoint}
+              hasChildren={true}
+              headings={portalStatisticHeadings}
+              itemKeys={portalStatisticItemKeys}
               queryString={periodQueryString}
-              shouldFormatCategories={true}
-              statisticKey="languages"
-              statisticKeyDateRange="language"
+              shouldFormatCategories={portalStatisticShouldFormatCategories}
               subtitle="-auto"
               source="No Car Gravel"
               tableType="basic"
-              title="Top Languages"
-            /> */}
+              title="Top Entrances and Exits"
+            >
+              <ToolbarOptions
+                handleClick={handlePortalStatisticChange}
+                options={
+                  [
+                    { 'id': 1, 'option': 'Entrances', 'value': 'enter' },
+                    { 'id': 2, 'option': 'Exits', 'value': 'exit' }, 
+                    { 'id': 3, 'option': 'Bounce Rate', 'value': 'bounce' }
+                  ]
+                }
+              />
+            </LayoutTable>
           </div>
         </Grid> 
       </Grid>
-      <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
+      {/* <Grid container rowSpacing={2} columnSpacing={{ sm:0, md: 10 }}>
         <Grid>
           <ContentViewsSummary />
         </Grid>
-      </Grid>
+      </Grid> */}
     </div>
   )
 }
