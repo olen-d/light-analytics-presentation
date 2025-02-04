@@ -134,7 +134,7 @@ const AdminView = () => {
             baseAnalyticsApiUrl={baseAnalyticsApiUrl}
             dateRangeFormatOptions={{ month: 'long', day: 'numeric' }}
             endpoint="api/v1/pages/routes/components/total-time"
-            queryString={`?componentName=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
+            queryString={`?component=courses&startdate=${widgetStatsStartDate}&enddate=${widgetStatsEndDate}`}
             shouldFormatSlug={true}
             source="No Car Gravel"
             statisticKey="data"
