@@ -64,6 +64,11 @@
   text-align: left;
 }
 
+.table-footer-button {
+  text-align: right;
+  padding-right: 1rem;
+}
+
 .chart-text-title {
   margin-bottom: 0.1rem;
 }
