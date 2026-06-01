@@ -67,7 +67,12 @@ const LayoutTable = ({
         break
       case 'languageName':
         const languageNames = new Intl.DisplayNames(['eng'], { type: 'language' })
-        elementFormatted = languageNames.of(element[category])
+        try {
+          elementFormatted = languageNames.of(element[category])
+        } catch (error) {
+          console.warn(`Invalid code or locale passed ot Intl.DisplayNames. Offending code: ${element[category]}`)
+        }
+
         break
       case 'percent':
         const pct = element[category] * 100
